@@ -17,9 +17,6 @@ export async function setup({ onInterfaceReady }) {
 
         // 1%
         if (dropChance < 0.01) {
-          console.log(dropWeight);
-          console.log(dropChance);
-          console.log(killCount);
           lootTable.drops[i].weight =
             dropWeight * Math.ceil(killCount * dropChance);
         }
