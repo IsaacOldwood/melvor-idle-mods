@@ -7,7 +7,8 @@ From the [Wiki](https://wiki.melvoridle.com/w/Main_Page):
 
 ## Why are you creating mods?
 1. To shape my gameplay to be exactly how I want it
-2. To practice JavaScript
+2. To make mods to fill other players requests
+3. To practice JavaScript
 
 # Current mods
 [Dynamic Drop Chances](https://mod.io/g/melvoridle/m/dynamic-drop-chances)
