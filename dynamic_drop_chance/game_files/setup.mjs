@@ -1,12 +1,12 @@
 export function setup(ctx) {
-  // ctx.settings.section("General").add([
-  //   {
-  //     type: "switch",
-  //     name: "completion-only",
-  //     label: "Apply multiplier to first drop only",
-  //     default: true,
-  //   },
-  // ]);
+  ctx.settings.section("General").add([
+    {
+      type: "switch",
+      name: "completion-only",
+      label: "Apply multiplier to first drop only",
+      default: true,
+    },
+  ]);
 
   ctx.settings.section("General").add([
     {
@@ -64,9 +64,9 @@ export function setup(ctx) {
 
       let itemFindCount = game.stats.itemFindCount(item);
       // If the item has been found and user setting is for first time only then don't modify
-      // if (completionOnly && (itemFindCount > 0)) {
-      //   continue;
-      // }
+      if (completionOnly && (itemFindCount > 0)) {
+        continue;
+      }
 
       // Stop 0 kill count causing divide by inf
       let killCountMultiplier = Math.max(Math.ceil(killCount * dropChance), 1);
