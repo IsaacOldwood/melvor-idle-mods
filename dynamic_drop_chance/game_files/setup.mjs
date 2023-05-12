@@ -1,4 +1,22 @@
 export function setup(ctx) {
+  ctx.settings.section("General").add([
+    {
+      type: "switch",
+      name: "completion-only",
+      label: "Apply multiplier to first drop only",
+      default: true,
+    },
+  ]);
+
+  ctx.settings.section("General").add([
+    {
+      type: "number",
+      name: "multiplier-threshold",
+      label: "Apply multiplier to drops with lower drop chance than:",
+      default: 0.01,
+    },
+  ]);
+
   ctx.settings.section("Multipliers").add([
     {
       type: "number",
@@ -9,41 +27,56 @@ export function setup(ctx) {
     },
   ]);
 
-  const updateDropChances = () => {
-    game.monsters.forEach(function (monster) {
-      if (!monster) {
-        return;
-      }
-      let lootTable = monster.lootTable;
-      let lootChance = monster.lootChance / 100;
-      let killCount = game.stats.monsterKillCount(monster);
-      if (!lootTable) {
-        return;
-      }
-      let totalWeight = lootTable.totalWeight;
-      for (let i = 0; i < lootTable.drops.length; i++) {
-        let dropWeight = lootTable.drops[i].weight;
-        let dropChance = (dropWeight / totalWeight) * lootChance;
+  const updateDropChances = (monster) => {
+    if (!monster) {
+      return;
+    }
+    let lootTable = monster.lootTable;
+    let lootChance = monster.lootChance / 100;
+    let killCount = game.stats.monsterKillCount(monster);
+    if (!lootTable) {
+      return;
+    }
+    let totalWeight = lootTable.totalWeight;
+    for (let i = 0; i < lootTable.drops.length; i++) {
+      let drop = lootTable.drops[i];
+      let item = drop.item;
+      let dropWeight = drop.weight;
+      let dropChance = (dropWeight / totalWeight) * lootChance;
 
-        // 1%
-        if (dropChance < 0.01) {
-          let maxUserKillCountMultiplier = ctx.settings
-            .section("Multipliers")
-            .get("max-kill-count-multiplier");
-          // Stop 0 kill count causing divide by inf
-          let killCountMultiplier = Math.max(
-            Math.ceil(killCount * dropChance),
-            1
-          );
-          lootTable.drops[i].weight =
-            dropWeight *
-            Math.min(killCountMultiplier, maxUserKillCountMultiplier);
-        }
+      // Get user settings
+      let multiplierThreshold = ctx.settings
+        .section("General")
+        .get("multiplier-threshold");
+
+      if (dropChance > multiplierThreshold) {
+        return;
       }
-    });
+
+      // Get user settings
+      let maxUserKillCountMultiplier = ctx.settings
+        .section("Multipliers")
+        .get("max-kill-count-multiplier");
+
+      let completionOnly = ctx.settings
+        .section("General")
+        .get("completion-only");
+
+      let itemFindCount = game.stats.itemFindCount(item);
+
+      // If the item has been found and user setting is for first time only then don't modify
+      if (completionOnly && itemFindCount > 0) {
+        return;
+      }
+
+      // Stop 0 kill count causing divide by inf
+      let killCountMultiplier = Math.max(Math.ceil(killCount * dropChance), 1);
+      lootTable.drops[i].weight =
+        dropWeight * Math.min(killCountMultiplier, maxUserKillCountMultiplier);
+    }
   };
 
   ctx.onInterfaceReady(() => {
-    updateDropChances();
+    game.monsters.forEach(updateDropChances);
   });
 }
