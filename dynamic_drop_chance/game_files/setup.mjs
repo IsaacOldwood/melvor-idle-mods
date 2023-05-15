@@ -70,8 +70,12 @@ export function setup(ctx) {
 
       // Stop 0 kill count causing divide by inf
       let killCountMultiplier = Math.max(Math.ceil(killCount * dropChance), 1);
-      lootTable.drops[i].weight =
-        dropWeight * Math.min(killCountMultiplier, maxUserKillCountMultiplier);
+      // Calculate new weight
+      let newWeight = dropWeight * Math.min(killCountMultiplier, maxUserKillCountMultiplier);
+
+      // Update weight and total weight accordingly
+      lootTable.drops[i].weight = newWeight;
+      lootTable.totalWeight = lootTable.totalWeight + (newWeight - dropWeight);
     }
   };
 
