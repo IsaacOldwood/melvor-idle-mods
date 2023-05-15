@@ -27,7 +27,7 @@ export function setup(ctx) {
     },
   ]);
 
-  const updateDropChances = (monster) => {
+  function updateCombatDropChances(monster) {
     if (!monster) {
       return;
     }
@@ -64,23 +64,23 @@ export function setup(ctx) {
 
       let itemFindCount = game.stats.itemFindCount(item);
       // If the item has been found and user setting is for first time only then don't modify
-      if (completionOnly && (itemFindCount > 0)) {
+      if (completionOnly && itemFindCount > 0) {
         continue;
       }
 
       // Stop 0 kill count causing divide by inf
       let killCountMultiplier = Math.max(Math.ceil(killCount * dropChance), 1);
       // Calculate new weight
-      let newWeight = dropWeight * Math.min(killCountMultiplier, maxUserKillCountMultiplier);
+      let newWeight =
+        dropWeight * Math.min(killCountMultiplier, maxUserKillCountMultiplier);
 
       // Update weight and total weight accordingly
       lootTable.drops[i].weight = newWeight;
       lootTable.totalWeight = lootTable.totalWeight + (newWeight - dropWeight);
     }
-  };
+  }
 
-  ctx.onInterfaceReady(() => {
-    console.log(ctx.settings.section("General").get("multiplier-threshold"));
-    game.monsters.forEach(updateDropChances);
+  ctx.onCharacterLoaded(() => {
+    game.monsters.forEach(updateCombatDropChances);
   });
 }
