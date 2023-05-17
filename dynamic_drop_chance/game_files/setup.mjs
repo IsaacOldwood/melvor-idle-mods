@@ -4,6 +4,9 @@ export function setup(ctx) {
       type: "switch",
       name: "completion-only",
       label: "Apply multiplier to first drop only",
+      onChange: (val) => {
+        game.monsters.forEach(updateCombatDropChances.bind({completionOnlyInput:val}));
+      },
       default: true,
     },
   ]);
@@ -13,6 +16,7 @@ export function setup(ctx) {
       type: "number",
       name: "multiplier-threshold",
       label: "Apply multiplier to drops with lower drop chance than:",
+      hint: "(Reload required)",
       default: 0.01,
     },
   ]);
@@ -22,6 +26,7 @@ export function setup(ctx) {
       type: "number",
       name: "max-kill-count-multiplier",
       label: "Max Kill Count Multiplier",
+      hint: "(Reload required)",
       default: 5,
       min: 1,
     },
@@ -37,11 +42,30 @@ export function setup(ctx) {
     if (!lootTable) {
       return;
     }
-    let totalWeight = lootTable.totalWeight;
+
+    // Save original data for reverting
+    if (!lootTable.hasOwnProperty("origTotalWeight")) {
+      lootTable.origTotalWeight = lootTable.totalWeight;
+    }
+    else {
+      // Reset values
+      lootTable.totalWeight = lootTable.origTotalWeight;
+    }
+    let totalWeight = lootTable.origTotalWeight;
+
     for (let i = 0; i < lootTable.drops.length; i++) {
+      // Save original data for reverting
+      if (!lootTable.drops[i].hasOwnProperty("origWeight")) {
+        lootTable.drops[i].origWeight = lootTable.drops[i].weight;
+      }
+      else {
+        // Reset values
+        lootTable.drops[i].weight = lootTable.drops[i].origWeight;
+      }
+
       let drop = lootTable.drops[i];
       let item = drop.item;
-      let dropWeight = drop.weight;
+      let dropWeight = drop.origWeight;
       let dropChance = (dropWeight / totalWeight) * lootChance;
 
       // Get user settings
@@ -58,7 +82,7 @@ export function setup(ctx) {
         .section("Multipliers")
         .get("max-kill-count-multiplier");
 
-      let completionOnly = ctx.settings
+      let completionOnly = this.completionOnlyInput != null ? this.completionOnlyInput : ctx.settings
         .section("General")
         .get("completion-only");
 
@@ -76,11 +100,13 @@ export function setup(ctx) {
 
       // Update weight and total weight accordingly
       lootTable.drops[i].weight = newWeight;
-      lootTable.totalWeight = lootTable.totalWeight + (newWeight - dropWeight);
+      lootTable.totalWeight = lootTable.origTotalWeight + (newWeight - dropWeight);
     }
   }
 
   ctx.onCharacterLoaded(() => {
-    game.monsters.forEach(updateCombatDropChances);
+    //console.log("DDC first run.");
+    game.monsters.forEach(updateCombatDropChances.bind({completionOnlyInput:null}));
+    //console.log("DDC first run complete.");
   });
 }
