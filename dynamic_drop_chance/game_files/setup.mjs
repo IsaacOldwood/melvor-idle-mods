@@ -4,6 +4,30 @@ var ddc_params = {
   maxUserKillCountMultiplierInput: null,
 };
 
+var ddc_pet_dungeon_ids = [
+  "melvorD:Chicken_Coop",
+  "melvorD:Undead_Graveyard",
+  "melvorD:Spider_Forest",
+  "melvorD:Frozen_Cove",
+  "melvorD:Deep_Sea_Ship",
+  "melvorD:Volcanic_Cave",
+  "melvorD:Bandit_Base",
+  "melvorD:Hall_of_Wizards",
+  "melvorF:Air_God_Dungeon",
+  "melvorF:Water_God_Dungeon",
+  "melvorF:Earth_God_Dungeon",
+  "melvorF:Fire_God_Dungeon",
+  "melvorF:Dragons_Den",
+  "melvorF:Miolite_Caves",
+  "melvorF:Infernal_Stronghold",
+  "melvorTotH:Ancient_Sanctuary",
+  "melvorTotH:Underground_Lava_Lake",
+  "melvorTotH:Lightning_Region",
+  "melvorTotH:Lair_of_the_Spider_Queen",
+  "melvorTotH:Cursed_Forest",
+  "melvorTotH:Necromancers_Palace",
+];
+
 export function setup(ctx) {
   ctx.settings.section("General").add([
     {
@@ -93,9 +117,7 @@ export function setup(ctx) {
       let maxUserKillCountMultiplier =
         this.maxUserKillCountMultiplierInput != null
           ? this.maxUserKillCountMultiplierInput
-          : ctx.settings
-              .section("Multipliers")
-              .get("max-kill-count-multiplier");
+          : ctx.settings.section("Multipliers").get("max-kill-count-multiplier");
 
       let completionOnly =
         this.completionOnlyInput != null
@@ -111,17 +133,40 @@ export function setup(ctx) {
       // Stop 0 kill count causing divide by inf
       let killCountMultiplier = Math.max(Math.ceil(killCount * dropChance), 1);
       // Calculate new weight
-      let newWeight =
-        dropWeight * Math.min(killCountMultiplier, maxUserKillCountMultiplier);
+      let newWeight = dropWeight * Math.min(killCountMultiplier, maxUserKillCountMultiplier);
 
       // Update weight and total weight accordingly
       lootTable.drops[i].weight = newWeight;
-      lootTable.totalWeight =
-        lootTable.origTotalWeight + (newWeight - dropWeight);
+      lootTable.totalWeight = lootTable.origTotalWeight + (newWeight - dropWeight);
     }
   }
 
+  function updateDungeonPetChance(dungeon_id) {
+    let dungeon = game.dungeons.getObjectByID(dungeon_id);
+    let monsters = dungeon.monsters;
+    let boss = monsters[monsters.length - 1];
+    if (!boss.isBoss) {
+      console.log("[DDC] Last monster for dungeon: ", dungeon.name, " is not boss");
+    }
+    let bossKills = game.stats.monsterKillCount(boss);
+
+    // Save original data for reverting
+    if (!dungeon.pet.hasOwnProperty("origWeight")) {
+      dungeon.pet.origWeight = dungeon.pet.weight;
+    } else {
+      // Reset values
+      dungeon.pet.weight = dungeon.pet.origWeight;
+    }
+
+    let petMultiplier = Math.max(Math.ceil(bossKills / dungeon.pet.origWeight), 1);
+    dungeon.pet.weight = dungeon.pet.origWeight / petMultiplier;
+  }
+
   ctx.onCharacterLoaded(() => {
+    console.log("[DDC] Updating drop chances");
     game.monsters.forEach(updateCombatDropChances.bind(ddc_params));
+    console.log("[DDC] Combat drop chances updated");
+    ddc_pet_dungeon_ids.forEach(updateDungeonPetChance);
+    console.log("[DDC] Dungeon pet drop chances updated");
   });
 }
