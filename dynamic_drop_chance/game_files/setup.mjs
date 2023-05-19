@@ -1,3 +1,9 @@
+var ddc_params = {
+  completionOnlyInput: null,
+  multiplierThresholdInput: null,
+  maxUserKillCountMultiplierInput: null,
+};
+
 export function setup(ctx) {
   ctx.settings.section("General").add([
     {
@@ -5,7 +11,8 @@ export function setup(ctx) {
       name: "completion-only",
       label: "Apply multiplier to first drop only",
       onChange: (val) => {
-        game.monsters.forEach(updateCombatDropChances.bind({completionOnlyInput:val}));
+        ddc_params.completionOnlyInput = val;
+        game.monsters.forEach(updateCombatDropChances.bind(ddc_params));
       },
       default: true,
     },
@@ -16,7 +23,10 @@ export function setup(ctx) {
       type: "number",
       name: "multiplier-threshold",
       label: "Apply multiplier to drops with lower drop chance than:",
-      hint: "(Reload required)",
+      onChange: (val) => {
+        ddc_params.multiplierThresholdInput = val;
+        game.monsters.forEach(updateCombatDropChances.bind(ddc_params));
+      },
       default: 0.01,
     },
   ]);
@@ -26,7 +36,10 @@ export function setup(ctx) {
       type: "number",
       name: "max-kill-count-multiplier",
       label: "Max Kill Count Multiplier",
-      hint: "(Reload required)",
+      onChange: (val) => {
+        ddc_params.maxUserKillCountMultiplierInput = val;
+        game.monsters.forEach(updateCombatDropChances.bind(ddc_params));
+      },
       default: 5,
       min: 1,
     },
@@ -46,8 +59,7 @@ export function setup(ctx) {
     // Save original data for reverting
     if (!lootTable.hasOwnProperty("origTotalWeight")) {
       lootTable.origTotalWeight = lootTable.totalWeight;
-    }
-    else {
+    } else {
       // Reset values
       lootTable.totalWeight = lootTable.origTotalWeight;
     }
@@ -57,8 +69,7 @@ export function setup(ctx) {
       // Save original data for reverting
       if (!lootTable.drops[i].hasOwnProperty("origWeight")) {
         lootTable.drops[i].origWeight = lootTable.drops[i].weight;
-      }
-      else {
+      } else {
         // Reset values
         lootTable.drops[i].weight = lootTable.drops[i].origWeight;
       }
@@ -69,22 +80,27 @@ export function setup(ctx) {
       let dropChance = (dropWeight / totalWeight) * lootChance;
 
       // Get user settings
-      let multiplierThreshold = ctx.settings
-        .section("General")
-        .get("multiplier-threshold");
+      let multiplierThreshold =
+        this.multiplierThresholdInput != null
+          ? this.multiplierThresholdInput
+          : ctx.settings.section("General").get("multiplier-threshold");
 
       if (dropChance > multiplierThreshold) {
         continue;
       }
 
       // Get user settings
-      let maxUserKillCountMultiplier = ctx.settings
-        .section("Multipliers")
-        .get("max-kill-count-multiplier");
+      let maxUserKillCountMultiplier =
+        this.maxUserKillCountMultiplierInput != null
+          ? this.maxUserKillCountMultiplierInput
+          : ctx.settings
+              .section("Multipliers")
+              .get("max-kill-count-multiplier");
 
-      let completionOnly = this.completionOnlyInput != null ? this.completionOnlyInput : ctx.settings
-        .section("General")
-        .get("completion-only");
+      let completionOnly =
+        this.completionOnlyInput != null
+          ? this.completionOnlyInput
+          : ctx.settings.section("General").get("completion-only");
 
       let itemFindCount = game.stats.itemFindCount(item);
       // If the item has been found and user setting is for first time only then don't modify
@@ -100,13 +116,12 @@ export function setup(ctx) {
 
       // Update weight and total weight accordingly
       lootTable.drops[i].weight = newWeight;
-      lootTable.totalWeight = lootTable.origTotalWeight + (newWeight - dropWeight);
+      lootTable.totalWeight =
+        lootTable.origTotalWeight + (newWeight - dropWeight);
     }
   }
 
   ctx.onCharacterLoaded(() => {
-    //console.log("DDC first run.");
-    game.monsters.forEach(updateCombatDropChances.bind({completionOnlyInput:null}));
-    //console.log("DDC first run complete.");
+    game.monsters.forEach(updateCombatDropChances.bind(ddc_params));
   });
 }
