@@ -192,4 +192,9 @@ export function setup(ctx) {
     ddc_pet_dungeon_ids.forEach(updateDungeonPetChance.bind(ddc_params));
     console.log("[DDC] Dungeon pet drop chances updated");
   });
+
+  ctx.patch(CombatManager, "onEnemyDeath").after(function () {
+    updateCombatDropChances.bind(ddc_params, this.enemy.monster);
+    return;
+  });
 }
