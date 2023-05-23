@@ -2,6 +2,7 @@ var ddc_params = {
   completionOnlyInput: null,
   multiplierThresholdInput: null,
   maxUserKillCountMultiplierInput: null,
+  petEnabledInput: null,
 };
 
 var ddc_pet_dungeon_ids = [
@@ -29,7 +30,7 @@ var ddc_pet_dungeon_ids = [
 ];
 
 export function setup(ctx) {
-  ctx.settings.section("General").add([
+  ctx.settings.section("Combat").add([
     {
       type: "switch",
       name: "completion-only",
@@ -42,7 +43,7 @@ export function setup(ctx) {
     },
   ]);
 
-  ctx.settings.section("General").add([
+  ctx.settings.section("Combat").add([
     {
       type: "number",
       name: "multiplier-threshold",
@@ -55,7 +56,7 @@ export function setup(ctx) {
     },
   ]);
 
-  ctx.settings.section("Multipliers").add([
+  ctx.settings.section("Combat").add([
     {
       type: "number",
       name: "max-kill-count-multiplier",
@@ -66,6 +67,19 @@ export function setup(ctx) {
       },
       default: 5,
       min: 1,
+    },
+  ]);
+
+  ctx.settings.section("Pets").add([
+    {
+      type: "switch",
+      name: "pets-enabled",
+      label: "Enable Dynamic Drop Chances for pets",
+      onChange: (val) => {
+        ddc_params.petEnabledInput = val;
+        ddc_pet_dungeon_ids.forEach(updateDungeonPetChance.bind(ddc_params));
+      },
+      default: true,
     },
   ]);
 
@@ -107,7 +121,7 @@ export function setup(ctx) {
       let multiplierThreshold =
         this.multiplierThresholdInput != null
           ? this.multiplierThresholdInput
-          : ctx.settings.section("General").get("multiplier-threshold");
+          : ctx.settings.section("Combat").get("multiplier-threshold");
 
       if (dropChance > multiplierThreshold) {
         continue;
@@ -117,12 +131,12 @@ export function setup(ctx) {
       let maxUserKillCountMultiplier =
         this.maxUserKillCountMultiplierInput != null
           ? this.maxUserKillCountMultiplierInput
-          : ctx.settings.section("Multipliers").get("max-kill-count-multiplier");
+          : ctx.settings.section("Combat").get("max-kill-count-multiplier");
 
       let completionOnly =
         this.completionOnlyInput != null
           ? this.completionOnlyInput
-          : ctx.settings.section("General").get("completion-only");
+          : ctx.settings.section("Combat").get("completion-only");
 
       let itemFindCount = game.stats.itemFindCount(item);
       // If the item has been found and user setting is for first time only then don't modify
@@ -147,6 +161,7 @@ export function setup(ctx) {
     let boss = monsters[monsters.length - 1];
     if (!boss.isBoss) {
       console.log("[DDC] Last monster for dungeon: ", dungeon.name, " is not boss");
+      return;
     }
     let bossKills = game.stats.monsterKillCount(boss);
 
@@ -158,6 +173,14 @@ export function setup(ctx) {
       dungeon.pet.weight = dungeon.pet.origWeight;
     }
 
+    // Get user settings
+    let petsEnabled =
+      this.petEnabledInput != null ? this.petEnabledInput : ctx.settings.section("Pets").get("pets-enabled");
+
+    if (!petsEnabled) {
+      return;
+    }
+
     let petMultiplier = Math.max(Math.ceil(bossKills / dungeon.pet.origWeight), 1);
     dungeon.pet.weight = dungeon.pet.origWeight / petMultiplier;
   }
@@ -166,7 +189,7 @@ export function setup(ctx) {
     console.log("[DDC] Updating drop chances");
     game.monsters.forEach(updateCombatDropChances.bind(ddc_params));
     console.log("[DDC] Combat drop chances updated");
-    ddc_pet_dungeon_ids.forEach(updateDungeonPetChance);
+    ddc_pet_dungeon_ids.forEach(updateDungeonPetChance.bind(ddc_params));
     console.log("[DDC] Dungeon pet drop chances updated");
   });
 }
