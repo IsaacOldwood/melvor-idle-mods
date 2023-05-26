@@ -2,6 +2,7 @@ var ddc_params = {
   completionOnlyInput: null,
   multiplierThresholdInput: null,
   maxUserKillCountMultiplierInput: null,
+  lootChanceMultiplierInput: null,
   petEnabledInput: null,
 };
 
@@ -69,6 +70,21 @@ function render_mod_settings(ctx) {
         game.monsters.forEach(updateCombatDropChances.bind(ddc_params));
       },
       default: 5,
+      min: 1,
+    },
+  ]);
+
+  ctx.settings.section("Combat").add([
+    {
+      type: "number",
+      name: "loot-chance-multiplier",
+      label: "Loot Chance Multiplier",
+      hint: "If an enemy's loot chance is less than 100%, multiply the loot chance (max 100%)",
+      onChange: (val) => {
+        ddc_params.lootChanceMultiplierInput = val;
+        game.monsters.forEach(updateCombatDropChances.bind(ddc_params));
+      },
+      default: 1,
       min: 1,
     },
   ]);
@@ -154,7 +170,28 @@ function updateCombatDropChances(monster) {
     return;
   }
   let lootTable = monster.lootTable;
-  let lootChance = monster.lootChance / 100;
+
+  // Save original data for reverting
+  if (!monster.hasOwnProperty("origLootChance")) {
+    monster.origLootChance = monster.lootChance;
+  } else {
+    // Reset values
+    monster.lootChance = monster.origLootChance;
+  }
+
+  // Get user settings
+  let lootChanceMultiplier =
+    this.lootChanceMultiplierInput != null
+      ? this.lootChanceMultiplierInput
+      : this.ctx.settings.section("Combat").get("loot-chance-multiplier");
+  let lootChance = Math.min(monster.origLootChance * lootChanceMultiplier, 100);
+
+  // Set new loot chance
+  monster.lootChance = lootChance;
+
+  // Convert original loot chance to decimal for use in calcs
+  let lootChanceDecimal = monster.origLootChance / 100;
+
   let killCount = game.stats.monsterKillCount(monster);
   if (!lootTable) {
     return;
@@ -181,7 +218,7 @@ function updateCombatDropChances(monster) {
     let drop = lootTable.drops[i];
     let item = drop.item;
     let dropWeight = drop.origWeight;
-    let dropChance = (dropWeight / totalWeight) * lootChance;
+    let dropChance = (dropWeight / totalWeight) * lootChanceDecimal;
 
     // Get user settings
     let multiplierThreshold =
