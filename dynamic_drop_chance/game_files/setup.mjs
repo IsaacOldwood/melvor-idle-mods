@@ -20,11 +20,14 @@ export function setup(ctx) {
     console.log("[DDC] Combat drop chances updated");
     ddc_pet_dungeon_ids.forEach(updateDungeonPetChance.bind(ddc_params));
     console.log("[DDC] Dungeon pet drop chances updated");
+    game.slayerAreas.forEach(updateSlayerAreaPetChance.bind(ddc_params));
+    console.log("[DDC] Slayer area pet drop chances updated");
   });
 
   // Update combat drop chances on enemy death
   ctx.patch(CombatManager, "onEnemyDeath").after(function () {
     updateCombatDropChances.bind(ddc_params, this.enemy.monster);
+    game.slayerAreas.forEach(updateSlayerAreaPetChance.bind(ddc_params));
     return;
   });
 }
@@ -97,6 +100,7 @@ function render_mod_settings(ctx) {
       onChange: (val) => {
         ddc_params.petEnabledInput = val;
         ddc_pet_dungeon_ids.forEach(updateDungeonPetChance.bind(ddc_params));
+        game.slayerAreas.forEach(updateSlayerAreaPetChance.bind(ddc_params));
       },
       default: true,
     },
@@ -159,6 +163,42 @@ function updateDungeonPetChance(dungeon_id) {
 
   let petMultiplier = Math.max(Math.ceil(bossKills / dungeon.pet.origWeight), 1);
   dungeon.pet.weight = dungeon.pet.origWeight / petMultiplier;
+}
+
+function updateSlayerAreaPetChance(slayerArea) {
+  if (!slayerArea.hasOwnProperty("pet")) {
+    return;
+  }
+
+  // Get user settings
+  let petsEnabled =
+    this.petEnabledInput != null ? this.petEnabledInput : this.ctx.settings.section("Pets").get("pets-enabled");
+
+  if (!petsEnabled) {
+    return;
+  }
+
+  // Save original data for reverting
+  if (!slayerArea.pet.hasOwnProperty("origWeight")) {
+    slayerArea.pet.origWeight = slayerArea.pet.weight;
+  } else {
+    // Reset values
+    slayerArea.pet.weight = slayerArea.pet.origWeight;
+  }
+
+  // Get slayer area monsters
+  var areaMonsters = slayerArea.monsters;
+
+  // Get slayer area kills
+  var areaKills = 0;
+  for (let i = 0; i < areaMonsters.length; i++) {
+    let monsterKills = game.stats.monsterKillCount(areaMonsters[i]);
+    areaKills += monsterKills;
+  }
+
+  // Set new drop chance
+  let petMultiplier = Math.max(Math.ceil(areaKills / slayerArea.pet.origWeight), 1);
+  slayerArea.pet.weight = slayerArea.pet.origWeight / petMultiplier;
 }
 
 // #########################################################################################

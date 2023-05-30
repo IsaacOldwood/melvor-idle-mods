@@ -1,3 +1,4 @@
 {
-    "setup": "setup.mjs"
-  }
+  "setup": "setup.mjs",
+  "namespace": "dynamicDropChance"
+}
