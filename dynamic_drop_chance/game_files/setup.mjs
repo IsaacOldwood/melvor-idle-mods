@@ -28,6 +28,7 @@ export function setup(ctx) {
   ctx.patch(CombatManager, "onEnemyDeath").after(function () {
     updateCombatDropChances.bind(ddc_params, this.enemy.monster);
     game.slayerAreas.forEach(updateSlayerAreaPetChance.bind(ddc_params));
+    ddc_pet_dungeon_ids.forEach(updateDungeonPetChance.bind(ddc_params));
     return;
   });
 }
@@ -163,6 +164,21 @@ function updateDungeonPetChance(dungeon_id) {
 
   let petMultiplier = Math.max(Math.ceil(bossKills / dungeon.pet.origWeight), 1);
   dungeon.pet.weight = Math.floor(dungeon.pet.origWeight / petMultiplier);
+
+  // Update tooltip
+  let petCompletionLog = completionLogMenu.pets.get(dungeon.pet.pet);
+  let tooltip = petCompletionLog.tooltip.popper.children[0].children[0].children[0].children[1];
+
+  // Save original data for reverting
+  if (!tooltip.hasOwnProperty("origText")) {
+    tooltip.origText = petCompletionLog.tooltip.popper.children[0].children[0].children[0].children[1].innerHTML;
+  } else {
+    // Reset values
+    petCompletionLog.tooltip.popper.children[0].children[0].children[0].children[1].innerHTML = tooltip.origText;
+  }
+
+  petCompletionLog.tooltip.popper.children[0].children[0].children[0].children[1].innerHTML =
+    tooltip.origText + "<br>Unlock chance: 1/" + dungeon.pet.weight.toString();
 }
 
 function updateSlayerAreaPetChance(slayerArea) {
@@ -199,6 +215,21 @@ function updateSlayerAreaPetChance(slayerArea) {
   // Set new drop chance
   let petMultiplier = Math.max(Math.ceil(areaKills / slayerArea.pet.origWeight), 1);
   slayerArea.pet.weight = Math.floor(slayerArea.pet.origWeight / petMultiplier);
+
+  // Update tooltip
+  let petCompletionLog = completionLogMenu.pets.get(slayerArea.pet.pet);
+  let tooltip = petCompletionLog.tooltip.popper.children[0].children[0].children[0].children[1];
+
+  // Save original data for reverting
+  if (!tooltip.hasOwnProperty("origText")) {
+    tooltip.origText = petCompletionLog.tooltip.popper.children[0].children[0].children[0].children[1].innerHTML;
+  } else {
+    // Reset values
+    petCompletionLog.tooltip.popper.children[0].children[0].children[0].children[1].innerHTML = tooltip.origText;
+  }
+
+  petCompletionLog.tooltip.popper.children[0].children[0].children[0].children[1].innerHTML =
+    tooltip.origText + "<br>Unlock chance: 1/" + slayerArea.pet.weight.toString();
 }
 
 // #########################################################################################
