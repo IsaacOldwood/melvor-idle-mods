@@ -162,7 +162,7 @@ function updateDungeonPetChance(dungeon_id) {
   }
 
   let petMultiplier = Math.max(Math.ceil(bossKills / dungeon.pet.origWeight), 1);
-  dungeon.pet.weight = dungeon.pet.origWeight / petMultiplier;
+  dungeon.pet.weight = Math.floor(dungeon.pet.origWeight / petMultiplier);
 }
 
 function updateSlayerAreaPetChance(slayerArea) {
@@ -198,7 +198,7 @@ function updateSlayerAreaPetChance(slayerArea) {
 
   // Set new drop chance
   let petMultiplier = Math.max(Math.ceil(areaKills / slayerArea.pet.origWeight), 1);
-  slayerArea.pet.weight = slayerArea.pet.origWeight / petMultiplier;
+  slayerArea.pet.weight = Math.floor(slayerArea.pet.origWeight / petMultiplier);
 }
 
 // #########################################################################################
@@ -293,7 +293,7 @@ function updateCombatDropChances(monster) {
     let newWeight = dropWeight * Math.min(killCountMultiplier, maxUserKillCountMultiplier);
 
     // Update weight and total weight accordingly
-    lootTable.drops[i].weight = newWeight;
+    lootTable.drops[i].weight = Math.floor(newWeight);
     lootTable.totalWeight = lootTable.origTotalWeight + (newWeight - dropWeight);
   }
 }
