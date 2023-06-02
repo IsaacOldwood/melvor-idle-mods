@@ -276,6 +276,7 @@ function updateCombatDropChances(monster) {
     lootTable.totalWeight = lootTable.origTotalWeight;
   }
   let totalWeight = lootTable.origTotalWeight;
+  let newTotalWeight = 0;
 
   for (let i = 0; i < lootTable.drops.length; i++) {
     // Save original data for reverting
@@ -298,6 +299,7 @@ function updateCombatDropChances(monster) {
         : this.ctx.settings.section("Combat").get("multiplier-threshold");
 
     if (dropChance > multiplierThreshold) {
+      newTotalWeight += dropWeight;
       continue;
     }
 
@@ -315,6 +317,7 @@ function updateCombatDropChances(monster) {
     let itemFindCount = game.stats.itemFindCount(item);
     // If the item has been found and user setting is for first time only then don't modify
     if (completionOnly && itemFindCount > 0) {
+      newTotalWeight += dropWeight;
       continue;
     }
 
@@ -325,6 +328,7 @@ function updateCombatDropChances(monster) {
 
     // Update weight and total weight accordingly
     lootTable.drops[i].weight = Math.floor(newWeight);
-    lootTable.totalWeight = lootTable.origTotalWeight + (newWeight - dropWeight);
+    newTotalWeight += Math.floor(newWeight);
   }
+  lootTable.totalWeight = newTotalWeight;
 }
