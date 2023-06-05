@@ -138,6 +138,9 @@ var ddc_pet_dungeon_ids = [
 
 function updateDungeonPetChance(dungeon_id) {
   let dungeon = game.dungeons.getObjectByID(dungeon_id);
+  if (dungeon === undefined) {
+    return;
+  }
   let monsters = dungeon.monsters;
   let boss = monsters[monsters.length - 1];
   if (!boss.isBoss) {
