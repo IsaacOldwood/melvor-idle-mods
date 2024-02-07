@@ -1,0 +1,5 @@
+{
+  "namespace": "combinedSkillcapes",
+  "load": ["combined_skillcapes.json"],
+  "icon": "combat_skillcape.png"
+}

@@ -17,6 +17,9 @@ From the [Wiki](https://wiki.melvoridle.com/w/Main_Page):
 [Remove Equipment Requirements](https://mod.io/g/melvoridle/m/remove-equipment-requirements)
 [253 active users]
 
+[Combined Skillcapes](https://mod.io/g/melvoridle/m/combined-skillcapes)
+[1 active users]
+
 [Auto Equip Loot](https://mod.io/g/melvoridle/m/auto-equip-loot)
 [77 active users] (88 ATH)
 
