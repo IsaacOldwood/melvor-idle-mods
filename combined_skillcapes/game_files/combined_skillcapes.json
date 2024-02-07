@@ -98,90 +98,374 @@
           "bypassSlayerItems": 1,
           "decreasedPrayerCost": 25
         }
+      },
+      {
+        "id": "Skillers_Skillcape",
+        "name": "Skillers Skillcape",
+        "category": "Combat",
+        "itemType": "Equipment",
+        "type": "Armour",
+        "media": "skillers_skillcape.png",
+        "ignoreCompletion": false,
+        "obtainFromItemLog": false,
+        "golbinRaidExclusive": false,
+        "sellsFor": 4000000,
+        "customDescription": "Inherits all Skillers Skillcape perks",
+        "tier": "Skillcape",
+        "validSlots": ["Cape"],
+        "occupiesSlots": [],
+        "equipRequirements": [
+          {
+            "type": "SkillLevel",
+            "skillID": "melvorD:Woodcutting",
+            "level": 99
+          },
+          {
+            "type": "SkillLevel",
+            "skillID": "melvorD:Fishing",
+            "level": 99
+          },
+          {
+            "type": "SkillLevel",
+            "skillID": "melvorD:Firemaking",
+            "level": 99
+          },
+          {
+            "type": "SkillLevel",
+            "skillID": "melvorD:Cooking",
+            "level": 99
+          },
+          {
+            "type": "SkillLevel",
+            "skillID": "melvorD:Mining",
+            "level": 99
+          },
+          {
+            "type": "SkillLevel",
+            "skillID": "melvorD:Thieving",
+            "level": 99
+          },
+          {
+            "type": "SkillLevel",
+            "skillID": "melvorD:Farming",
+            "level": 99
+          },
+          {
+            "type": "SkillLevel",
+            "skillID": "melvorD:Fletching",
+            "level": 99
+          },
+          {
+            "type": "SkillLevel",
+            "skillID": "melvorD:Crafting",
+            "level": 99
+          },
+          {
+            "type": "SkillLevel",
+            "skillID": "melvorD:Runecrafting",
+            "level": 99
+          },
+          {
+            "type": "SkillLevel",
+            "skillID": "melvorD:Herblore",
+            "level": 99
+          },
+          {
+            "type": "SkillLevel",
+            "skillID": "melvorD:Agility",
+            "level": 99
+          },
+          {
+            "type": "SkillLevel",
+            "skillID": "melvorD:Summoning",
+            "level": 99
+          },
+          {
+            "type": "SkillLevel",
+            "skillID": "melvorD:Astrology",
+            "level": 99
+          },
+          {
+            "type": "SkillLevel",
+            "skillID": "melvorD:Township",
+            "level": 99
+          }
+        ],
+        "equipmentStats": [
+          {
+            "key": "meleeDefenceBonus",
+            "value": 9
+          },
+          {
+            "key": "rangedDefenceBonus",
+            "value": 9
+          },
+          {
+            "key": "magicDefenceBonus",
+            "value": 9
+          }
+        ],
+        "modifiers": {
+          "decreasedSkillIntervalPercent": [
+            {
+              "skillID": "melvorD:Woodcutting",
+              "value": 15
+            },
+            {
+              "skillID": "melvorD:Cooking",
+              "value": 15
+            },
+            {
+              "skillID": "melvorD:Astrology",
+              "value": 3
+            }
+          ],
+          "decreasedSkillInterval": [
+            {
+              "skillID": "melvorD:Thieving",
+              "value": 500
+            },
+            {
+              "skillID": "melvorD:Crafting",
+              "value": 500
+            }
+          ],
+          "doubleItemsSkill": [
+            {
+              "skillID": "melvorD:Fishing",
+              "value": 1
+            },
+            {
+              "skillID": "melvorD:Fletching",
+              "value": 1
+            },
+            {
+              "skillID": "melvorD:Herblore",
+              "value": 1
+            }
+          ],
+          "increasedGlobalSkillXP": 5,
+          "increasedFiremakingCoalChance": 100,
+          "increasedChanceForAshInFiremaking": 100,
+          "increasedChanceSuccessfulCook": 100,
+          "increasedChancePerfectCookGlobal": 2,
+          "increasedBonusCoalMining": 1,
+          "increasedFarmingYield": 25,
+          "increasedGPFromThieving": 100,
+          "increasedThievingStealth": 150,
+          "increasedChanceToDoubleItemsSkill": [
+            {
+              "skillID": "melvorD:Runecrafting",
+              "value": 15
+            }
+          ],
+          "increasedAdditionalRunecraftCountRunes": 5,
+          "decreasedAgilityObstacleCost": 20,
+          "increasedGPFromAgility": 10,
+          "increasedSkillPreservationChance": [
+            {
+              "skillID": "melvorD:Summoning",
+              "value": 20
+            }
+          ],
+          "increasedSummoningChargePreservation": 10,
+          "increasedSummoningCreationCharges": 10,
+          "decreasedTownshipBuildingCost": 15
+        }
       }
     ],
     "shopPurchases": [
       {
-				"id": "Combat_Skillcape",
-				"media": "combat_skillcape.png",
-				"category": "melvorD:Skillcapes",
-				"contains": {
-					"items": [
-						{
-							"id": "combinedSkillcapes:Combat_Skillcape",
-							"quantity": 1
-						}
-					]
-				},
-				"cost": {
-					"gp": {
-						"type": "Fixed",
-						"cost": 8000000
-					},
-					"slayerCoins": {
-						"type": "Fixed",
-						"cost": 0
-					},
-					"items": [],
-					"raidCoins": {
-						"type": "Fixed",
-						"cost": 0
-					}
-				},
-				"allowQuantityPurchase": false,
-				"unlockRequirements": [],
-				"purchaseRequirements": [
-					{
-						"type": "SkillLevel",
-						"skillID": "melvorD:Attack",
-						"level": 99
-					},
-					{
-						"type": "SkillLevel",
-						"skillID": "melvorD:Strength",
-						"level": 99
-					},
-					{
-						"type": "SkillLevel",
-						"skillID": "melvorD:Defence",
-						"level": 99
-					},
-					{
-						"type": "SkillLevel",
-						"skillID": "melvorD:Hitpoints",
-						"level": 99
-					},
-					{
-						"type": "SkillLevel",
-						"skillID": "melvorD:Ranged",
-						"level": 99
-					},
-					{
-						"type": "SkillLevel",
-						"skillID": "melvorD:Magic",
-						"level": 99
-					},
-					{
-						"type": "SkillLevel",
-						"skillID": "melvorD:Prayer",
-						"level": 99
-					},
-					{
-						"type": "SkillLevel",
-						"skillID": "melvorD:Slayer",
-						"level": 99
-					}
-				],
-				"defaultBuyLimit": 0,
-				"buyLimitOverrides": [],
-				"showBuyLimit": false
-			}
+        "id": "Combat_Skillcape",
+        "media": "combat_skillcape.png",
+        "category": "melvorD:Skillcapes",
+        "contains": {
+          "items": [
+            {
+              "id": "combinedSkillcapes:Combat_Skillcape",
+              "quantity": 1
+            }
+          ]
+        },
+        "cost": {
+          "gp": {
+            "type": "Fixed",
+            "cost": 8000000
+          },
+          "slayerCoins": {
+            "type": "Fixed",
+            "cost": 0
+          },
+          "items": [],
+          "raidCoins": {
+            "type": "Fixed",
+            "cost": 0
+          }
+        },
+        "allowQuantityPurchase": false,
+        "unlockRequirements": [],
+        "purchaseRequirements": [
+          {
+            "type": "SkillLevel",
+            "skillID": "melvorD:Attack",
+            "level": 99
+          },
+          {
+            "type": "SkillLevel",
+            "skillID": "melvorD:Strength",
+            "level": 99
+          },
+          {
+            "type": "SkillLevel",
+            "skillID": "melvorD:Defence",
+            "level": 99
+          },
+          {
+            "type": "SkillLevel",
+            "skillID": "melvorD:Hitpoints",
+            "level": 99
+          },
+          {
+            "type": "SkillLevel",
+            "skillID": "melvorD:Ranged",
+            "level": 99
+          },
+          {
+            "type": "SkillLevel",
+            "skillID": "melvorD:Magic",
+            "level": 99
+          },
+          {
+            "type": "SkillLevel",
+            "skillID": "melvorD:Prayer",
+            "level": 99
+          },
+          {
+            "type": "SkillLevel",
+            "skillID": "melvorD:Slayer",
+            "level": 99
+          }
+        ],
+        "defaultBuyLimit": 0,
+        "buyLimitOverrides": [],
+        "showBuyLimit": false
+      },
+      {
+        "id": "Skillers_Skillcape",
+        "media": "skillers_skillcape.png",
+        "category": "melvorD:Skillcapes",
+        "contains": {
+          "items": [
+            {
+              "id": "combinedSkillcapes:Skillers_Skillcape",
+              "quantity": 1
+            }
+          ]
+        },
+        "cost": {
+          "gp": {
+            "type": "Fixed",
+            "cost": 16000000
+          },
+          "slayerCoins": {
+            "type": "Fixed",
+            "cost": 0
+          },
+          "items": [],
+          "raidCoins": {
+            "type": "Fixed",
+            "cost": 0
+          }
+        },
+        "allowQuantityPurchase": false,
+        "unlockRequirements": [],
+        "purchaseRequirements": [
+          {
+            "type": "SkillLevel",
+            "skillID": "melvorD:Woodcutting",
+            "level": 99
+          },
+          {
+            "type": "SkillLevel",
+            "skillID": "melvorD:Fishing",
+            "level": 99
+          },
+          {
+            "type": "SkillLevel",
+            "skillID": "melvorD:Firemaking",
+            "level": 99
+          },
+          {
+            "type": "SkillLevel",
+            "skillID": "melvorD:Cooking",
+            "level": 99
+          },
+          {
+            "type": "SkillLevel",
+            "skillID": "melvorD:Mining",
+            "level": 99
+          },
+          {
+            "type": "SkillLevel",
+            "skillID": "melvorD:Thieving",
+            "level": 99
+          },
+          {
+            "type": "SkillLevel",
+            "skillID": "melvorD:Farming",
+            "level": 99
+          },
+          {
+            "type": "SkillLevel",
+            "skillID": "melvorD:Fletching",
+            "level": 99
+          },
+          {
+            "type": "SkillLevel",
+            "skillID": "melvorD:Crafting",
+            "level": 99
+          },
+          {
+            "type": "SkillLevel",
+            "skillID": "melvorD:Runecrafting",
+            "level": 99
+          },
+          {
+            "type": "SkillLevel",
+            "skillID": "melvorD:Herblore",
+            "level": 99
+          },
+          {
+            "type": "SkillLevel",
+            "skillID": "melvorD:Agility",
+            "level": 99
+          },
+          {
+            "type": "SkillLevel",
+            "skillID": "melvorD:Summoning",
+            "level": 99
+          },
+          {
+            "type": "SkillLevel",
+            "skillID": "melvorD:Astrology",
+            "level": 99
+          },
+          {
+            "type": "SkillLevel",
+            "skillID": "melvorD:Township",
+            "level": 99
+          }
+        ],
+        "defaultBuyLimit": 0,
+        "buyLimitOverrides": [],
+        "showBuyLimit": false
+      }
     ],
     "shopDisplayOrder": [
       {
         "insertAt": "After",
         "afterID": "melvorD:Woodcutting_Skillcape",
-        "ids": ["combinedSkillcapes:Combat_Skillcape"]
+        "ids": ["combinedSkillcapes:Combat_Skillcape", "combinedSkillcapes:Skillers_Skillcape"]
       }
     ]
   }
