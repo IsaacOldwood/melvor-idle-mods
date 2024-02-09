@@ -12,15 +12,15 @@ From the [Wiki](https://wiki.melvoridle.com/w/Main_Page):
 
 # Current mods
 [Dynamic Drop Chances](https://mod.io/g/melvoridle/m/dynamic-drop-chances)
-[1208 active users]
+[1214 active users]
 
 [Remove Equipment Requirements](https://mod.io/g/melvoridle/m/remove-equipment-requirements)
-[253 active users]
+[254 active users]
 
 [Combined Skillcapes](https://mod.io/g/melvoridle/m/combined-skillcapes)
-[1 active users]
+[9 active users]
 
 [Auto Equip Loot](https://mod.io/g/melvoridle/m/auto-equip-loot)
-[77 active users] (88 ATH)
+[76 active users] (88 ATH)
 
-*(Data correct as of 07/02/24)*
+*(Data correct as of 09/02/24)*
