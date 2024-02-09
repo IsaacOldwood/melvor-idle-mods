@@ -1,0 +1,5 @@
+{
+    "setup": "setup.mjs",
+    "load": "templates.html",
+    "icon": "Museum_Token.png"
+  }
