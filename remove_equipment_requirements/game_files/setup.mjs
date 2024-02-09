@@ -1,5 +1,5 @@
-export async function setup({ onInterfaceReady }) {
-  onInterfaceReady(() => {
+export async function setup({ onModsLoaded }) {
+  onModsLoaded(() => {
     game.items.forEach(function (item) {
       if (!item) {
         return;
@@ -8,10 +8,13 @@ export async function setup({ onInterfaceReady }) {
       if (!equipRequirements) {
         return;
       }
-      for (let i = 0; i < equipRequirements.length; i++) {
+      for (let i = equipRequirements.length - 1; i >= 0; i--) {
         let requirement = equipRequirements[i];
         if (requirement.type == "DungeonCompletion") {
-          item.equipRequirements.splice(i, 1);
+          item.equipRequirements[i].count = 0;
+        }
+        if (requirement.type == "SkillLevel") {
+          item.equipRequirements[i].level = 1;
         }
       }
     });
