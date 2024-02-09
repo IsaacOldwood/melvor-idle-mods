@@ -21,7 +21,7 @@ From the [Wiki](https://wiki.melvoridle.com/w/Main_Page):
 [9 active users]
 
 [Museum Tokens in Shop](https://mod.io/g/melvoridle/m/museum-tokens-in-shop)
-[1 active users]
+[2 active users]
 
 [Auto Equip Loot](https://mod.io/g/melvoridle/m/auto-equip-loot)
 [76 active users] (88 ATH)
