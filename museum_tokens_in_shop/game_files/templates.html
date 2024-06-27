@@ -1,15 +1,19 @@
 <template id="museum-token-count-component">
-  <span
-    class="p-2 bg-secondary text-white rounded m-1"
-    id="museum-token-c"
-    data-toggle="tooltip"
-    data-html="true"
-    data-placement="bottom"
-    ><img
-      class="skill-icon-xs"
-      data-src="assets/media/bank/Museum_Token.png"
-      src="https://cdn2-main.melvor.net/assets/media/bank/Museum_Token.png"
-    />
-    <span id="shop-current-museum-token">{{token_count}} Museum Tokens</span>
-  </span>
+  <li>
+    <span
+      class="p-2 bg-secondary text-white rounded m-1 js-tooltip-enabled"
+      id="museum-token-c"
+      data-toggle="tooltip"
+      data-html="true"
+      data-placement="bottom"
+      data-original-title="Museum Tokens"
+      ><img
+        class="skill-icon-xs"
+        data-src="assets/media/bank/Museum_Token.png"
+        src="https://cdn2-main.melvor.net/assets/media/bank/Museum_Token.png"
+        alt="Museum Token"
+      />
+      <span id="shop-current-museum-token">{{token_count}}</span>
+    </span>
+  </li>
 </template>
