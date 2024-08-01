@@ -14,9 +14,11 @@ function selectAllButton() {
   return {
     $template: "#bank-tab-select-all-button",
     selectAllInTab() {
-      console.log("selecting all in tab");
-      let tab = document.querySelector(`div[class="tab-pane active"]`);
-      tab.children[0].children.forEach((item) => {
+      let tab = document.querySelector(`div[class="tab-pane active"]`).children[0].children;
+      tab.forEach((item) => {
+        if (item.className.includes("d-none")) {
+          return;
+        }
         item.click();
       });
     },
