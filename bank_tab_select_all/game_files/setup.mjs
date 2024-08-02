@@ -7,6 +7,9 @@ export function setup(ctx) {
       document.getElementById("main-bank-move-mode").querySelector(`lang-string[lang-id="MENU_TEXT_CONFIRM_MOVE"]`)
         .parentElement.parentElement
     );
+    // Move to before last element
+    const newButton = document.getElementById("bank-tab-select-all");
+    newButton.parentElement.insertBefore(newButton, newButton.previousElementSibling);
   });
 }
 
