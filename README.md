@@ -27,6 +27,6 @@ From the [Wiki](https://wiki.melvoridle.com/w/Main_Page):
 [65 active users] (88 ATH)
 
 [Bank Tab Select All](https://mod.io/g/melvoridle/m/bank-tab-select-all)
-[7 active users]
+[20 active users]
 
-*(Data correct as of 01/08/24)*
+*(Data correct as of 02/08/24)*
