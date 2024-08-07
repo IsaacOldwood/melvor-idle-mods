@@ -18,9 +18,9 @@ export function setup(ctx) {
     });
   });
 
-  // Execute code after offline progress has been calculated and all in-game user interface elements have been created.
-  ctx.onInterfaceReady(async (ctx) => {
-    // Setup dungeon pets
+  // Update all drop chances on character load BEFORE offline progress
+  ctx.onCharacterLoaded((ctx) => {
+    // Setup pets
     console.log("[DDC] Saving default pet drop chances");
     game.dungeons.forEach((dungeon) => {
       setupDungeonPet(dungeon);
@@ -29,118 +29,28 @@ export function setup(ctx) {
     game.slayerAreas.forEach((slayerArea) => {
       setupSlayerAreaPet(slayerArea);
     });
-  });
-}
 
-// #########################################################################################
-// SETUP
-// #########################################################################################
-
-// Setup combat
-function setupMonster(monster) {
-  // Save original game data to allow reverting overwrites
-  if (!monster.hasOwnProperty("origLootChance")) {
-    monster.origLootChance = monster.lootChance;
-  }
-
-  let lootTable = monster.lootTable;
-
-  if (!lootTable.hasOwnProperty("origTotalWeight")) {
-    lootTable.origTotalWeight = lootTable.totalWeight;
-  }
-
-  lootTable.drops.forEach((drop) => {
-    if (!drop.hasOwnProperty("origWeight")) {
-      drop.origWeight = drop.weight;
+    if (ctx.settings.section("Pets").get("pets-enabled")) {
+      console.log("[DDC] Updating pet drop chances");
+      game.dungeons.forEach((dungeon) => {
+        updateDungeonPetChance(dungeon);
+      });
+      //game.slayerAreas.forEach(updateSlayerAreaPetChance);
     }
   });
-}
 
-// Setup pets
-function setupDungeonPet(dungeon) {
-  // Don't run for dungeons without pets
-  if (!dungeon.hasOwnProperty("pet")) {
-    return;
-  }
+  // Execute code after offline progress has been calculated and all in-game user interface elements have been created.
+  ctx.onInterfaceReady(async (ctx) => {
+    // Setup pet tooltips
+    console.log("[DDC] Updating pet tooltips");
+    game.dungeons.forEach((dungeon) => {
+      setupDungeonPetTooltip(dungeon);
+      updateDungeonPetTooltip(dungeon);
+    });
 
-  // Don't run for pets that unlock on fixed number of clears
-  if (dungeon.fixedPetClears) {
-    return;
-  }
-
-  // Don't run for pets that unlock on first completion
-  if (dungeon.pet.weight == 1) {
-    return;
-  }
-
-  // Save original game data to allow reverting overwrites
-  if (!dungeon.pet.hasOwnProperty("origWeight")) {
-    dungeon.pet.origWeight = dungeon.pet.weight;
-  }
-
-  // Update tooltip
-  try {
-    let petCompletionLog = completionLogMenu.pets.get(dungeon.pet.pet);
-    let tooltip = petCompletionLog.tooltip.popper.children[0].children[0].children[0].children[1];
-
-    // Save original game data to allow reverting overwrites
-    if (!tooltip.hasOwnProperty("origText")) {
-      tooltip.origText = petCompletionLog.tooltip.popper.children[0].children[0].children[0].children[1].innerHTML;
-    }
-  } catch (e) {
-    console.error("Failed to update tooltip for dungeon pet: " + dungeon._name);
-  }
-}
-
-function setupSlayerAreaPet(slayerArea) {
-  // Don't run for slayer areas without pets
-  if (!slayerArea.hasOwnProperty("pet")) {
-    return;
-  }
-
-  // Save original game data to allow reverting overwrites
-  if (!slayerArea.pet.hasOwnProperty("origWeight")) {
-    slayerArea.pet.origWeight = slayerArea.pet.weight;
-  }
-
-  // Update tooltip
-  try {
-    let petCompletionLog = completionLogMenu.pets.get(slayerArea.pet.pet);
-    let tooltip = petCompletionLog.tooltip.popper.children[0].children[0].children[0].children[1];
-
-    // Save original data for reverting
-    if (!tooltip.hasOwnProperty("origText")) {
-      tooltip.origText = petCompletionLog.tooltip.popper.children[0].children[0].children[0].children[1].innerHTML;
-    }
-  } catch (e) {
-    console.error("Failed to update tooltip for slayer area pet: " + slayerArea._name);
-  }
-}
-
-// Setup thieving
-function setupThievingArea(area) {
-  area.npcs.forEach((npc) => {
-    setupThievingNPC(npc);
-  });
-}
-function setupThievingNPC(npc) {
-  // Initialize action counter
-  if (!npc.hasOwnProperty("thievingCount")) {
-    npc.thievingCount = 0;
-  }
-
-  let lootTable = npc.lootTable;
-
-  // Don't run for NPCs without loot
-  if (lootTable.totalWeight == 0) {
-    return;
-  }
-
-  // Save original game data to allow reverting overwrites
-  lootTable.drops.forEach((drop) => {
-    if (!drop.hasOwnProperty("origWeight")) {
-      drop.origWeight = drop.weight;
-    }
+    game.slayerAreas.forEach((slayerArea) => {
+      setupSlayerAreaPetTooltip(slayerArea);
+    });
   });
 }
 
@@ -226,4 +136,176 @@ function render_mod_settings(ctx) {
       default: true,
     },
   ]);
+}
+
+// #########################################################################################
+// SETUP
+// #########################################################################################
+
+// Setup combat
+function setupMonster(monster) {
+  // Save original game data to allow reverting overwrites
+  if (!monster.hasOwnProperty("origLootChance")) {
+    monster.origLootChance = monster.lootChance;
+  }
+
+  let lootTable = monster.lootTable;
+
+  if (!lootTable.hasOwnProperty("origTotalWeight")) {
+    lootTable.origTotalWeight = lootTable.totalWeight;
+  }
+
+  lootTable.drops.forEach((drop) => {
+    if (!drop.hasOwnProperty("origWeight")) {
+      drop.origWeight = drop.weight;
+    }
+  });
+}
+
+// Setup pets
+function setupDungeonPet(dungeon) {
+  if (!assertDungeonPet(dungeon)) {
+    return;
+  }
+
+  // Save original game data to allow reverting overwrites
+  if (!dungeon.pet.hasOwnProperty("origWeight")) {
+    dungeon.pet.origWeight = dungeon.pet.weight;
+  }
+}
+
+function setupDungeonPetTooltip(dungeon) {
+  if (!assertDungeonPet(dungeon)) {
+    return;
+  }
+  // Update tooltip
+  try {
+    let petCompletionLog = completionLogMenu.pets.get(dungeon.pet.pet);
+    let tooltip = petCompletionLog.tooltip.popper.children[0].children[0].children[0].children[1];
+
+    // Save original game data to allow reverting overwrites
+    if (!tooltip.hasOwnProperty("origText")) {
+      tooltip.origText = petCompletionLog.tooltip.popper.children[0].children[0].children[0].children[1].innerHTML;
+    }
+  } catch (e) {
+    console.error("Failed to update tooltip for dungeon pet: " + dungeon._name);
+  }
+}
+
+function setupSlayerAreaPet(slayerArea) {
+  // Don't run for slayer areas without pets
+  if (!slayerArea.hasOwnProperty("pet")) {
+    return;
+  }
+
+  // Save original game data to allow reverting overwrites
+  if (!slayerArea.pet.hasOwnProperty("origWeight")) {
+    slayerArea.pet.origWeight = slayerArea.pet.weight;
+  }
+}
+
+function setupSlayerAreaPetTooltip(slayerArea) {
+  // Don't run for slayer areas without pets
+  if (!slayerArea.hasOwnProperty("pet")) {
+    return;
+  }
+
+  // Update tooltip
+  try {
+    let petCompletionLog = completionLogMenu.pets.get(slayerArea.pet.pet);
+    let tooltip = petCompletionLog.tooltip.popper.children[0].children[0].children[0].children[1];
+
+    // Save original data for reverting
+    if (!tooltip.hasOwnProperty("origText")) {
+      tooltip.origText = petCompletionLog.tooltip.popper.children[0].children[0].children[0].children[1].innerHTML;
+    }
+  } catch (e) {
+    console.error("Failed to update tooltip for slayer area pet: " + slayerArea._name);
+  }
+}
+
+// Setup thieving
+function setupThievingArea(area) {
+  area.npcs.forEach((npc) => {
+    setupThievingNPC(npc);
+  });
+}
+function setupThievingNPC(npc) {
+  // Initialize action counter
+  if (!npc.hasOwnProperty("thievingCount")) {
+    npc.thievingCount = 0;
+  }
+
+  let lootTable = npc.lootTable;
+
+  // Don't run for NPCs without loot
+  if (lootTable.totalWeight == 0) {
+    return;
+  }
+
+  // Save original game data to allow reverting overwrites
+  lootTable.drops.forEach((drop) => {
+    if (!drop.hasOwnProperty("origWeight")) {
+      drop.origWeight = drop.weight;
+    }
+  });
+}
+
+// #########################################################################################
+// PETS
+// #########################################################################################
+
+function assertDungeonPet(dungeon) {
+  if (!dungeon.hasOwnProperty("pet")) {
+    return false;
+  }
+
+  // Don't run for pets that unlock on fixed number of clears
+  if (dungeon.fixedPetClears) {
+    return false;
+  }
+
+  // Don't run for pets that unlock on first completion else return true
+  return dungeon.pet.origWeight != 1;
+}
+
+function updateDungeonPetChance(dungeon) {
+  if (!assertDungeonPet(dungeon)) {
+    return;
+  }
+
+  const pet = dungeon.pet;
+
+  // Reset values
+  pet.weight = pet.origWeight;
+
+  let monsters = dungeon.monsters;
+  let boss = monsters[monsters.length - 1];
+  if (!boss.isBoss) {
+    console.error("[DDC] Last monster for dungeon: ", dungeon.name, " is not boss");
+    return;
+  }
+  let bossKills = game.stats.monsterKillCount(boss);
+
+  let petMultiplier = Math.max(Math.ceil(bossKills / pet.origWeight), 1);
+  pet.weight = Math.floor(pet.origWeight / petMultiplier);
+}
+
+function updateDungeonPetTooltip(dungeon) {
+  if (!assertDungeonPet(dungeon)) {
+    return;
+  }
+
+  const pet = dungeon.pet;
+
+  // Update tooltip
+  try {
+    let petCompletionLog = completionLogMenu.pets.get(pet.pet);
+    let tooltip = petCompletionLog.tooltip.popper.children[0].children[0].children[0].children[1];
+
+    // Set value
+    tooltip.innerHTML = tooltip.origText + "<br>Unlock chance: 1/" + pet.weight.toString();
+  } catch (e) {
+    console.error("Failed to update tooltip for dungeon pet: " + slayerArea._name);
+  }
 }
