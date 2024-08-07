@@ -17,9 +17,13 @@ function selectAllButton() {
   return {
     $template: "#bank-tab-select-all-button",
     selectAllInTab() {
-      let tab = document.querySelector(`div[class="tab-pane active"]`).children[0].children;
+      const tab = document.querySelector(`div[class="tab-pane active"]`).children[0].children;
       tab.forEach((item) => {
         if (item.className.includes("d-none")) {
+          return;
+        }
+        const localID = item.dataset.itemId.split(":")[1];
+        if (Array.from(game.bank.selectedItems).some((i) => i.item._localID === localID)) {
           return;
         }
         item.click();
