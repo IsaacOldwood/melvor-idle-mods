@@ -1,0 +1,29 @@
+{
+  // See https://go.microsoft.com/fwlink/?LinkId=733558
+  // for the documentation about the tasks.json format
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Zip files",
+      "type": "shell",
+      "command": "cd ${workspaceFolder}//${input:mod_folder}; tar -a -c -C game_files -f ${input:mod_folder}-v${input:version_number}.zip *",
+    }
+  ],
+  "inputs": [
+    {
+      "id": "mod_folder",
+      "type": "pickString",
+      "description": "Choose the mod_folder",
+      "options": [
+        "bank-tab-select-all",
+      ],
+      "default": "bank-tab-select-all"
+    },
+    {
+      "id": "version_number",
+      "type": "promptString",
+      "description": "Mod version number",
+      "default": "1-0"
+    }
+  ]
+}
