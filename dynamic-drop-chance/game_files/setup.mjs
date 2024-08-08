@@ -10,12 +10,6 @@ export function setup(ctx) {
     game.monsters.forEach((monster) => {
       setupMonster(monster);
     });
-
-    // Setup thieving
-    console.log("[DDC] Loading thieving data and saving default drop chances");
-    game.thieving.areas.forEach((area) => {
-      setupThievingArea(area);
-    });
   });
 
   // Update all drop chances on character load BEFORE offline progress
@@ -35,7 +29,9 @@ export function setup(ctx) {
       game.dungeons.forEach((dungeon) => {
         updateDungeonPetChance(dungeon);
       });
-      //game.slayerAreas.forEach(updateSlayerAreaPetChance);
+      game.slayerAreas.forEach((slayerArea) => {
+        updateSlayerAreaPetChance(slayerArea);
+      });
     }
   });
 
@@ -50,6 +46,7 @@ export function setup(ctx) {
 
     game.slayerAreas.forEach((slayerArea) => {
       setupSlayerAreaPetTooltip(slayerArea);
+      updateSlayerAreaPetTooltip(slayerArea);
     });
   });
 }
@@ -188,7 +185,7 @@ function setupDungeonPetTooltip(dungeon) {
       tooltip.origText = petCompletionLog.tooltip.popper.children[0].children[0].children[0].children[1].innerHTML;
     }
   } catch (e) {
-    console.error("Failed to update tooltip for dungeon pet: " + dungeon._name);
+    console.error("[DDC] Failed to update tooltip for dungeon pet: " + dungeon._name);
   }
 }
 
@@ -220,35 +217,8 @@ function setupSlayerAreaPetTooltip(slayerArea) {
       tooltip.origText = petCompletionLog.tooltip.popper.children[0].children[0].children[0].children[1].innerHTML;
     }
   } catch (e) {
-    console.error("Failed to update tooltip for slayer area pet: " + slayerArea._name);
+    console.error("[DDC] Failed to update tooltip for slayer area pet: " + slayerArea._name);
   }
-}
-
-// Setup thieving
-function setupThievingArea(area) {
-  area.npcs.forEach((npc) => {
-    setupThievingNPC(npc);
-  });
-}
-function setupThievingNPC(npc) {
-  // Initialize action counter
-  if (!npc.hasOwnProperty("thievingCount")) {
-    npc.thievingCount = 0;
-  }
-
-  let lootTable = npc.lootTable;
-
-  // Don't run for NPCs without loot
-  if (lootTable.totalWeight == 0) {
-    return;
-  }
-
-  // Save original game data to allow reverting overwrites
-  lootTable.drops.forEach((drop) => {
-    if (!drop.hasOwnProperty("origWeight")) {
-      drop.origWeight = drop.weight;
-    }
-  });
 }
 
 // #########################################################################################
@@ -276,9 +246,6 @@ function updateDungeonPetChance(dungeon) {
 
   const pet = dungeon.pet;
 
-  // Reset values
-  pet.weight = pet.origWeight;
-
   let completionCount = game.combat.getDungeonCompleteCount(dungeon);
   let petMultiplier = Math.max(Math.ceil(completionCount / pet.origWeight), 1);
   pet.weight = Math.floor(pet.origWeight / petMultiplier);
@@ -299,6 +266,41 @@ function updateDungeonPetTooltip(dungeon) {
     // Set value
     tooltip.innerHTML = tooltip.origText + "<br>Unlock chance: 1/" + pet.weight.toString();
   } catch (e) {
-    console.error("Failed to update tooltip for dungeon pet: " + slayerArea._name);
+    console.error("[DDC] Failed to update tooltip for dungeon pet: " + slayerArea._name);
+  }
+}
+
+function updateSlayerAreaPetChance(slayerArea) {
+  if (!slayerArea.hasOwnProperty("pet")) {
+    return;
+  }
+
+  // Get slayer area monsters
+  let areaMonsters = slayerArea.monsters;
+
+  // Get slayer area kills
+  let areaKills = 0;
+  for (const monster of areaMonsters) {
+    let monsterKills = game.stats.monsterKillCount(monster);
+    areaKills += monsterKills;
+  }
+
+  // Set new drop chance
+  let petMultiplier = Math.max(Math.ceil(areaKills / slayerArea.pet.origWeight), 1);
+  slayerArea.pet.weight = Math.floor(slayerArea.pet.origWeight / petMultiplier);
+}
+
+function updateSlayerAreaPetTooltip(slayerArea) {
+  if (!slayerArea.hasOwnProperty("pet")) {
+    return;
+  }
+  // Update tooltip
+  try {
+    let petCompletionLog = completionLogMenu.pets.get(slayerArea.pet.pet);
+    let tooltip = petCompletionLog.tooltip.popper.children[0].children[0].children[0].children[1];
+
+    tooltip.innerHTML = tooltip.origText + "<br>Unlock chance: 1/" + slayerArea.pet.weight.toString();
+  } catch (e) {
+    console.error("[DDC] Failed to update tooltip for slayer area pet: " + slayerArea._name);
   }
 }
