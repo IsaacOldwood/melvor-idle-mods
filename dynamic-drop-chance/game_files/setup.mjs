@@ -24,6 +24,7 @@ export function setup(ctx) {
       setupSlayerAreaPet(slayerArea);
     });
 
+    // If dynamic pet chances are enabled, update pet drop chances
     if (ctx.settings.section("Pets").get("pets-enabled")) {
       console.log("[DDC] Updating pet drop chances");
       game.dungeons.forEach((dungeon) => {
@@ -33,6 +34,20 @@ export function setup(ctx) {
         updateSlayerAreaPetChance(slayerArea);
       });
     }
+
+    // Update combat drop chances
+    console.log("[DDC] Updating combat drop chances");
+    game.monsters.forEach((monster) => {
+      updateCombatDropChances(
+        monster,
+        ctx.settings.section("Combat").get("loot-chance-multiplier"),
+        ctx.settings.section("Combat").get("multiplier-threshold"),
+        ctx.settings.section("Combat").get("max-multiplier"),
+        ctx.settings.section("Combat").get("completion-only")
+      );
+    });
+
+    console.log("[DDC] Drop chances updated");
   });
 
   // Execute code after offline progress has been calculated and all in-game user interface elements have been created.
@@ -303,4 +318,68 @@ function updateSlayerAreaPetTooltip(slayerArea) {
   } catch (e) {
     console.error("[DDC] Failed to update tooltip for slayer area pet: " + slayerArea._name);
   }
+}
+
+// #########################################################################################
+// COMBAT
+// #########################################################################################
+
+function updateCombatDropChances(
+  monster,
+  lootChanceMultiplier,
+  multiplierThreshold,
+  maxUserKillCountMultiplier,
+  completionOnly
+) {
+  if (!monster) {
+    return;
+  }
+  let lootTable = monster.lootTable;
+  if (!lootTable) {
+    return;
+  }
+
+  // Set new loot chance
+  let lootChance = Math.min(monster.origLootChance * lootChanceMultiplier, 100);
+  monster.lootChance = lootChance;
+
+  // Convert original loot chance to decimal for use in calcs
+  let lootChanceDecimal = monster.origLootChance / 100;
+
+  // Get kill count for monster
+  let killCount = game.stats.monsterKillCount(monster);
+
+  // Save original data for reverting
+  let totalWeight = lootTable.origTotalWeight;
+  let newTotalWeight = 0;
+
+  for (const drop of lootTable.drops) {
+    let item = drop.item;
+    let dropWeight = drop.origWeight;
+    let dropChance = (dropWeight / totalWeight) * lootChanceDecimal;
+
+    // If drop chance is higher than threshold then don't modify
+    if (dropChance > multiplierThreshold) {
+      newTotalWeight += dropWeight;
+      continue;
+    }
+
+    let itemFindCount = game.stats.itemFindCount(item);
+    // If the item has been found and user setting is for first time only then don't modify
+    if (completionOnly && itemFindCount > 0) {
+      newTotalWeight += dropWeight;
+      continue;
+    }
+
+    // Stop 0 kill count causing divide by inf
+    let killCountMultiplier = Math.max(Math.ceil(killCount * dropChance), 1);
+    // Calculate new weight
+    let newWeight = dropWeight * Math.min(killCountMultiplier, maxUserKillCountMultiplier);
+
+    // Update weight and total weight accordingly
+    drop.weight = Math.floor(newWeight);
+    newTotalWeight += Math.floor(newWeight);
+  }
+  // Set new total weight
+  lootTable.totalWeight = newTotalWeight;
 }

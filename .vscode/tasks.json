@@ -6,7 +6,8 @@
     {
       "label": "Zip files",
       "type": "shell",
-      "command": "cd ${workspaceFolder}//${input:mod_folder}; tar -a -c -C game_files -f ${input:mod_folder}-v${input:version_number}.zip *"
+      "command": "cd ${workspaceFolder}//${input:mod_folder}; tar -a -c -C game_files -f ${input:mod_folder}-v${input:version_number}.zip *",
+      "problemMatcher": []
     }
   ],
   "inputs": [
