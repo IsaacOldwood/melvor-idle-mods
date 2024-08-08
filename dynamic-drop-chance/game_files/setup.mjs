@@ -20,6 +20,10 @@ export function setup(ctx) {
       setupDungeonPet(dungeon);
     });
 
+    game.strongholds.forEach((stronghold) => {
+      setupStrongholdPet(stronghold);
+    });
+
     game.slayerAreas.forEach((slayerArea) => {
       setupSlayerAreaPet(slayerArea);
     });
@@ -29,6 +33,9 @@ export function setup(ctx) {
       console.log("[DDC] Updating pet drop chances");
       game.dungeons.forEach((dungeon) => {
         updateDungeonPetChance(dungeon);
+      });
+      game.strongholds.forEach((stronghold) => {
+        updateStrongholdPetChance(stronghold);
       });
       game.slayerAreas.forEach((slayerArea) => {
         updateSlayerAreaPetChance(slayerArea);
@@ -57,6 +64,11 @@ export function setup(ctx) {
     game.dungeons.forEach((dungeon) => {
       setupDungeonPetTooltip(dungeon);
       updateDungeonPetTooltip(dungeon);
+    });
+
+    game.strongholds.forEach((stronghold) => {
+      setupStrongholdPetTooltip(stronghold);
+      updateStrongholdPetTooltip(stronghold);
     });
 
     game.slayerAreas.forEach((slayerArea) => {
@@ -185,6 +197,10 @@ function render_mod_settings(ctx) {
             updateDungeonPetChance(dungeon);
             updateDungeonPetTooltip(dungeon);
           });
+          game.strongholds.forEach((stronghold) => {
+            updateStrongholdPetChance(stronghold);
+            updateStrongholdPetTooltip(stronghold);
+          });
           game.slayerAreas.forEach((slayerArea) => {
             updateSlayerAreaPetChance(slayerArea);
             updateSlayerAreaPetTooltip(slayerArea);
@@ -249,6 +265,32 @@ function setupDungeonPetTooltip(dungeon) {
   }
 }
 
+function setupStrongholdPet(stronghold) {
+  if (!stronghold.hasOwnProperty("pet")) {
+    return false;
+  }
+
+  // Save original game data to allow reverting overwrites
+  if (!stronghold.pet.hasOwnProperty("origWeight")) {
+    stronghold.pet.origWeight = stronghold.pet.weight;
+  }
+}
+
+function setupStrongholdPetTooltip(stronghold) {
+  // Update tooltip
+  try {
+    let petCompletionLog = completionLogMenu.pets.get(stronghold.pet.pet);
+    let tooltip = petCompletionLog.tooltip.popper.children[0].children[0].children[0].children[1];
+
+    // Save original game data to allow reverting overwrites
+    if (!tooltip.hasOwnProperty("origText")) {
+      tooltip.origText = petCompletionLog.tooltip.popper.children[0].children[0].children[0].children[1].innerHTML;
+    }
+  } catch (e) {
+    console.error("[DDC] Failed to update tooltip for stronghold pet: " + stronghold._name);
+  }
+}
+
 function setupSlayerAreaPet(slayerArea) {
   // Don't run for slayer areas without pets
   if (!slayerArea.hasOwnProperty("pet")) {
@@ -296,7 +338,7 @@ function assertDungeonPet(dungeon) {
   }
 
   // Don't run for pets that unlock on first completion else return true
-  return dungeon.pet.origWeight != 1;
+  return dungeon.pet.weight != 1;
 }
 
 function updateDungeonPetChance(dungeon) {
@@ -326,7 +368,36 @@ function updateDungeonPetTooltip(dungeon) {
     // Set value
     tooltip.innerHTML = tooltip.origText + "<br>Unlock chance: 1/" + pet.weight.toString();
   } catch (e) {
-    console.error("[DDC] Failed to update tooltip for dungeon pet: " + slayerArea._name);
+    console.error("[DDC] Failed to update tooltip for dungeon pet: " + dungeon._name);
+  }
+}
+
+function updateStrongholdPetChance(stronghold) {
+  if (!stronghold.hasOwnProperty("pet")) {
+    return false;
+  }
+  const pet = stronghold.pet;
+
+  let completionCount = stronghold.timesCompleted;
+  let petMultiplier = Math.max(Math.ceil(completionCount / pet.origWeight), 1);
+  pet.weight = Math.floor(pet.origWeight / petMultiplier);
+}
+
+function updateStrongholdPetTooltip(stronghold) {
+  if (!stronghold.hasOwnProperty("pet")) {
+    return false;
+  }
+  const pet = stronghold.pet;
+
+  // Update tooltip
+  try {
+    let petCompletionLog = completionLogMenu.pets.get(pet.pet);
+    let tooltip = petCompletionLog.tooltip.popper.children[0].children[0].children[0].children[1];
+
+    // Set value
+    tooltip.innerHTML = tooltip.origText + "<br>Unlock chance: 1/" + pet.weight.toString();
+  } catch (e) {
+    console.error("[DDC] Failed to update tooltip for stronghold pet: " + stronghold._name);
   }
 }
 
