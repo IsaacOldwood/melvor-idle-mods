@@ -205,6 +205,19 @@ function render_mod_settings(ctx) {
             updateSlayerAreaPetChance(slayerArea);
             updateSlayerAreaPetTooltip(slayerArea);
           });
+        } else {
+          game.dungeons.forEach((dungeon) => {
+            resetDungeonPetChance(dungeon);
+            updateDungeonPetTooltip(dungeon);
+          });
+          game.strongholds.forEach((stronghold) => {
+            resetStrongholdPetChance(stronghold);
+            updateStrongholdPetTooltip(stronghold);
+          });
+          game.slayerAreas.forEach((slayerArea) => {
+            resetSlayerAreaPetChance(slayerArea);
+            updateSlayerAreaPetTooltip(slayerArea);
+          });
         }
       },
     },
@@ -353,6 +366,15 @@ function updateDungeonPetChance(dungeon) {
   pet.weight = Math.floor(pet.origWeight / petMultiplier);
 }
 
+function resetDungeonPetChance(dungeon) {
+  if (!assertDungeonPet(dungeon)) {
+    return;
+  }
+
+  const pet = dungeon.pet;
+  pet.weight = pet.origWeight;
+}
+
 function updateDungeonPetTooltip(dungeon) {
   if (!assertDungeonPet(dungeon)) {
     return;
@@ -381,6 +403,14 @@ function updateStrongholdPetChance(stronghold) {
   let completionCount = stronghold.timesCompleted;
   let petMultiplier = Math.max(Math.ceil(completionCount / pet.origWeight), 1);
   pet.weight = Math.floor(pet.origWeight / petMultiplier);
+}
+
+function resetStrongholdPetChance(stronghold) {
+  if (!stronghold.hasOwnProperty("pet")) {
+    return false;
+  }
+  const pet = stronghold.pet;
+  pet.weight = pet.origWeight;
 }
 
 function updateStrongholdPetTooltip(stronghold) {
@@ -419,6 +449,14 @@ function updateSlayerAreaPetChance(slayerArea) {
   // Set new drop chance
   let petMultiplier = Math.max(Math.ceil(areaKills / slayerArea.pet.origWeight), 1);
   slayerArea.pet.weight = Math.floor(slayerArea.pet.origWeight / petMultiplier);
+}
+
+function resetSlayerAreaPetChance(slayerArea) {
+  if (!slayerArea.hasOwnProperty("pet")) {
+    return;
+  }
+  const pet = slayerArea.pet;
+  pet.weight = pet.origWeight;
 }
 
 function updateSlayerAreaPetTooltip(slayerArea) {
