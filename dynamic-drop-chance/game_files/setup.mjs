@@ -64,6 +64,17 @@ export function setup(ctx) {
       updateSlayerAreaPetTooltip(slayerArea);
     });
   });
+
+  // Patch enemy death to update drop chances
+  ctx.patch(CombatManager, "onEnemyDeath").after(function () {
+    updateCombatDropChances(
+      this.enemy.monster,
+      ctx.settings.section("Combat").get("loot-chance-multiplier"),
+      ctx.settings.section("Combat").get("multiplier-threshold"),
+      ctx.settings.section("Combat").get("max-multiplier"),
+      ctx.settings.section("Combat").get("completion-only")
+    );
+  });
 }
 
 // #########################################################################################
@@ -76,11 +87,18 @@ function render_mod_settings(ctx) {
       type: "switch",
       name: "completion-only",
       label: "Apply multiplier to first drop only",
-      // onChange: (val) => {
-      //   ddc_params.completionOnlyInput = val;
-      //   game.monsters.forEach(updateCombatDropChances.bind(ddc_params));
-      // },
       default: true,
+      onChange: (val) => {
+        game.monsters.forEach((monster) => {
+          updateCombatDropChances(
+            monster,
+            ctx.settings.section("Combat").get("loot-chance-multiplier"),
+            ctx.settings.section("Combat").get("multiplier-threshold"),
+            ctx.settings.section("Combat").get("max-multiplier"),
+            val
+          );
+        });
+      },
     },
   ]);
 
@@ -96,11 +114,17 @@ function render_mod_settings(ctx) {
         } else if (val <= 0) {
           return "Threshold must be in decimal format and greater than 0";
         }
+
+        game.monsters.forEach((monster) => {
+          updateCombatDropChances(
+            monster,
+            ctx.settings.section("Combat").get("loot-chance-multiplier"),
+            val,
+            ctx.settings.section("Combat").get("max-multiplier"),
+            ctx.settings.section("Combat").get("completion-only")
+          );
+        });
       },
-      // onChange: (val) => {
-      //   ddc_params.multiplierThresholdInput = val;
-      //   game.monsters.forEach(updateCombatDropChances.bind(ddc_params));
-      // },
       default: 0.01,
     },
   ]);
@@ -111,12 +135,19 @@ function render_mod_settings(ctx) {
       name: "max-multiplier",
       label: "Maximum Multiplier",
       hint: "Maximum multiplier that can be applied to drop chances",
-      // onChange: (val) => {
-      //   ddc_params.maxUserKillCountMultiplierInput = val;
-      //   game.monsters.forEach(updateCombatDropChances.bind(ddc_params));
-      // },
       default: 5,
       min: 1,
+      onChange: (val) => {
+        game.monsters.forEach((monster) => {
+          updateCombatDropChances(
+            monster,
+            ctx.settings.section("Combat").get("loot-chance-multiplier"),
+            ctx.settings.section("Combat").get("multiplier-threshold"),
+            val,
+            ctx.settings.section("Combat").get("completion-only")
+          );
+        });
+      },
     },
   ]);
 
@@ -126,12 +157,19 @@ function render_mod_settings(ctx) {
       name: "loot-chance-multiplier",
       label: "Loot Chance Multiplier",
       hint: "If an enemy's loot chance is less than 100%, increase the loot chance (max 100%)",
-      // onChange: (val) => {
-      //   ddc_params.lootChanceMultiplierInput = val;
-      //   game.monsters.forEach(updateCombatDropChances.bind(ddc_params));
-      // },
       default: 1,
       min: 1,
+      onChange: (val) => {
+        game.monsters.forEach((monster) => {
+          updateCombatDropChances(
+            monster,
+            val,
+            ctx.settings.section("Combat").get("multiplier-threshold"),
+            ctx.settings.section("Combat").get("max-multiplier"),
+            ctx.settings.section("Combat").get("completion-only")
+          );
+        });
+      },
     },
   ]);
 
@@ -140,12 +178,19 @@ function render_mod_settings(ctx) {
       type: "switch",
       name: "pets-enabled",
       label: "Enable Dynamic Drop Chances for pets",
-      // onChange: (val) => {
-      //   ddc_params.petEnabledInput = val;
-      //   game.dungeons.forEach(updateDungeonPetChance.bind(ddc_params));
-      //   game.slayerAreas.forEach(updateSlayerAreaPetChance.bind(ddc_params));
-      // },
       default: true,
+      onChange: (val) => {
+        if (val) {
+          game.dungeons.forEach((dungeon) => {
+            updateDungeonPetChance(dungeon);
+            updateDungeonPetTooltip(dungeon);
+          });
+          game.slayerAreas.forEach((slayerArea) => {
+            updateSlayerAreaPetChance(slayerArea);
+            updateSlayerAreaPetTooltip(slayerArea);
+          });
+        }
+      },
     },
   ]);
 }
@@ -360,6 +405,8 @@ function updateCombatDropChances(
 
     // If drop chance is higher than threshold then don't modify
     if (dropChance > multiplierThreshold) {
+      // Reset weight
+      drop.weight = dropWeight;
       newTotalWeight += dropWeight;
       continue;
     }
@@ -367,6 +414,8 @@ function updateCombatDropChances(
     let itemFindCount = game.stats.itemFindCount(item);
     // If the item has been found and user setting is for first time only then don't modify
     if (completionOnly && itemFindCount > 0) {
+      // Reset weight
+      drop.weight = dropWeight;
       newTotalWeight += dropWeight;
       continue;
     }
