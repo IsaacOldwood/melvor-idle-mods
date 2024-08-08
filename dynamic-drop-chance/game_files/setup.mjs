@@ -279,15 +279,8 @@ function updateDungeonPetChance(dungeon) {
   // Reset values
   pet.weight = pet.origWeight;
 
-  let monsters = dungeon.monsters;
-  let boss = monsters[monsters.length - 1];
-  if (!boss.isBoss) {
-    console.error("[DDC] Last monster for dungeon: ", dungeon.name, " is not boss");
-    return;
-  }
-  let bossKills = game.stats.monsterKillCount(boss);
-
-  let petMultiplier = Math.max(Math.ceil(bossKills / pet.origWeight), 1);
+  let completionCount = game.combat.getDungeonCompleteCount(dungeon);
+  let petMultiplier = Math.max(Math.ceil(completionCount / pet.origWeight), 1);
   pet.weight = Math.floor(pet.origWeight / petMultiplier);
 }
 
