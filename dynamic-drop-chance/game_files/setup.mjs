@@ -50,7 +50,8 @@ export function setup(ctx) {
         ctx.settings.section("Combat").get("loot-chance-multiplier"),
         ctx.settings.section("Combat").get("multiplier-threshold"),
         ctx.settings.section("Combat").get("max-multiplier"),
-        ctx.settings.section("Combat").get("completion-only")
+        ctx.settings.section("Combat").get("completion-only"),
+        ctx.settings.section("Combat").get("custom-multiplier")
       );
     });
 
@@ -84,7 +85,8 @@ export function setup(ctx) {
       ctx.settings.section("Combat").get("loot-chance-multiplier"),
       ctx.settings.section("Combat").get("multiplier-threshold"),
       ctx.settings.section("Combat").get("max-multiplier"),
-      ctx.settings.section("Combat").get("completion-only")
+      ctx.settings.section("Combat").get("completion-only"),
+      ctx.settings.section("Combat").get("custom-multiplier")
     );
   });
 }
@@ -107,14 +109,12 @@ function render_mod_settings(ctx) {
             ctx.settings.section("Combat").get("loot-chance-multiplier"),
             ctx.settings.section("Combat").get("multiplier-threshold"),
             ctx.settings.section("Combat").get("max-multiplier"),
-            val
+            val,
+            ctx.settings.section("Combat").get("custom-multiplier")
           );
         });
       },
     },
-  ]);
-
-  ctx.settings.section("Combat").add([
     {
       type: "number",
       name: "multiplier-threshold",
@@ -133,15 +133,13 @@ function render_mod_settings(ctx) {
             ctx.settings.section("Combat").get("loot-chance-multiplier"),
             val,
             ctx.settings.section("Combat").get("max-multiplier"),
-            ctx.settings.section("Combat").get("completion-only")
+            ctx.settings.section("Combat").get("completion-only"),
+            ctx.settings.section("Combat").get("custom-multiplier")
           );
         });
       },
       default: 0.01,
     },
-  ]);
-
-  ctx.settings.section("Combat").add([
     {
       type: "number",
       name: "max-multiplier",
@@ -156,14 +154,12 @@ function render_mod_settings(ctx) {
             ctx.settings.section("Combat").get("loot-chance-multiplier"),
             ctx.settings.section("Combat").get("multiplier-threshold"),
             val,
-            ctx.settings.section("Combat").get("completion-only")
+            ctx.settings.section("Combat").get("completion-only"),
+            ctx.settings.section("Combat").get("custom-multiplier")
           );
         });
       },
     },
-  ]);
-
-  ctx.settings.section("Combat").add([
     {
       type: "number",
       name: "loot-chance-multiplier",
@@ -178,7 +174,28 @@ function render_mod_settings(ctx) {
             val,
             ctx.settings.section("Combat").get("multiplier-threshold"),
             ctx.settings.section("Combat").get("max-multiplier"),
-            ctx.settings.section("Combat").get("completion-only")
+            ctx.settings.section("Combat").get("completion-only"),
+            ctx.settings.section("Combat").get("custom-multiplier")
+          );
+        });
+      },
+    },
+    {
+      type: "number",
+      name: "custom-multiplier",
+      label: "Custom Multiplier",
+      hint: "Custom multiplier that can be applied to drop chances",
+      default: 1,
+      min: 1,
+      onChange: (val) => {
+        game.monsters.forEach((monster) => {
+          updateCombatDropChances(
+            monster,
+            ctx.settings.section("Combat").get("loot-chance-multiplier"),
+            ctx.settings.section("Combat").get("multiplier-threshold"),
+            ctx.settings.section("Combat").get("max-multiplier"),
+            ctx.settings.section("Combat").get("completion-only"),
+            val
           );
         });
       },
@@ -483,7 +500,8 @@ function updateCombatDropChances(
   lootChanceMultiplier,
   multiplierThreshold,
   maxUserKillCountMultiplier,
-  completionOnly
+  completionOnly,
+  customMultiplier
 ) {
   if (!monster) {
     return;
@@ -532,7 +550,7 @@ function updateCombatDropChances(
     // Stop 0 kill count causing divide by inf
     let killCountMultiplier = Math.max(Math.ceil(killCount * dropChance), 1);
     // Calculate new weight
-    let newWeight = dropWeight * Math.min(killCountMultiplier, maxUserKillCountMultiplier);
+    let newWeight = dropWeight * Math.min(killCountMultiplier, maxUserKillCountMultiplier) * customMultiplier;
 
     // Update weight and total weight accordingly
     drop.weight = Math.floor(newWeight);

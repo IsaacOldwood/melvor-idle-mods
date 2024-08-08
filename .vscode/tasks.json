@@ -16,7 +16,7 @@
       "type": "pickString",
       "description": "Choose the mod_folder",
       "options": ["bank-tab-select-all", "dynamic-drop-chance"],
-      "default": "bank-tab-select-all"
+      "default": "dynamic-drop-chance"
     },
     {
       "id": "version_number",
