@@ -5,9 +5,10 @@ export async function setup(ctx) {
   const modSetupService = await ctx.loadModule("modSetup.mjs");
   const modPetsService = await ctx.loadModule("modPets.mjs");
   const modCombatService = await ctx.loadModule("modCombat.mjs");
+  const modStrongholdGemsService = await ctx.loadModule("modStrongholdGems.mjs");
 
   // Render mod settings
-  modSettingsService.renderModSettings(ctx, modCombatService, modPetsService);
+  modSettingsService.renderModSettings(ctx, modCombatService, modPetsService, modStrongholdGemsService);
 
   // After game data is loaded
   ctx.onModsLoaded(async (ctx) => {
@@ -15,6 +16,10 @@ export async function setup(ctx) {
     console.log("[DDC] Saving default drop chances");
     game.monsters.forEach((monster) => {
       modSetupService.setupMonster(monster);
+    });
+
+    game.strongholds.forEach((stronghold) => {
+      modSetupService.setupStrongholdGem(stronghold);
     });
   });
 
@@ -68,6 +73,15 @@ export async function setup(ctx) {
       );
     });
 
+    // Update stronghold gem drop chances
+    console.log("[DDC] Updating stronghold gem drop chances");
+    game.strongholds.forEach((stronghold) => {
+      modStrongholdGemsService.updateStrongholdGem(
+        stronghold,
+        ctx.settings.section("Stronghold gems").get("gems-completion-only")
+      );
+    });
+
     console.log("[DDC] Drop chances updated");
   });
 
@@ -79,7 +93,7 @@ export async function setup(ctx) {
       modSetupService.setupDungeonPetTooltip(modPetsService, dungeon);
       modPetsService.updateDungeonPetTooltip(dungeon);
     });
-    
+
     game.abyssDepths.forEach((dungeon) => {
       modSetupService.setupDungeonPetTooltip(modPetsService, dungeon);
       modPetsService.updateDungeonPetTooltip(dungeon);
@@ -106,5 +120,16 @@ export async function setup(ctx) {
       ctx.settings.section("Combat").get("completion-only"),
       ctx.settings.section("Combat").get("custom-multiplier")
     );
+  });
+
+  // Patch stronghold completion update drop chances
+  ctx.patch(CombatManager, "increaseStrongholdProgress").after(function (stopCombat, stronghold, monster) {
+    // If stronghold finished
+    if (this.areaProgress >= stronghold.monsters.length - 1) {
+      modStrongholdGemsService.updateStrongholdGem(
+        stronghold,
+        ctx.settings.section("Stronghold gems").get("gems-completion-only")
+      );
+    }
   });
 }

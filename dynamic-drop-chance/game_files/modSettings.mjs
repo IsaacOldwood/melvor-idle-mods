@@ -1,5 +1,5 @@
 // Stores all mod settings and related functions
-export function renderModSettings(ctx, modCombatService, modPetsService) {
+export function renderModSettings(ctx, modCombatService, modPetsService, modStrongholdGemsService) {
   ctx.settings.section("Combat").add([
     {
       type: "switch",
@@ -101,6 +101,20 @@ export function renderModSettings(ctx, modCombatService, modPetsService) {
             ctx.settings.section("Combat").get("completion-only"),
             val
           );
+        });
+      },
+    },
+  ]);
+
+  ctx.settings.section("Stronghold gems").add([
+    {
+      type: "switch",
+      name: "gems-completion-only",
+      label: "Apply multiplier to first drop only",
+      default: true,
+      onChange: (val) => {
+        game.strongholds.forEach((stronghold) => {
+          modStrongholdGemsService.updateStrongholdGem(stronghold, val);
         });
       },
     },

@@ -90,3 +90,16 @@ export function setupSlayerAreaPetTooltip(slayerArea) {
   // Update tooltip
   setupPetTooltip(slayerArea.pet.pet);
 }
+
+export function setupStrongholdGem(stronghold) {
+  if (!stronghold.dropsLoot) {
+    return false;
+  }
+
+  let gem = stronghold.tiers.Superior.rewards;
+
+  // Save original game data to allow reverting overwrites
+  if (!gem.hasOwnProperty("origChance")) {
+    gem.origChance = gem.chance;
+  }
+}
