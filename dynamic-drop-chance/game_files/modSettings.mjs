@@ -118,6 +118,10 @@ export function renderModSettings(ctx, modCombatService, modPetsService) {
             modPetsService.updateDungeonPetChance(dungeon);
             modPetsService.updateDungeonPetTooltip(dungeon);
           });
+          game.abyssDepths.forEach((dungeon) => {
+            modPetsService.updateDungeonPetChance(dungeon);
+            modPetsService.updateDungeonPetTooltip(dungeon);
+          });
           game.strongholds.forEach((stronghold) => {
             modPetsService.updateStrongholdPetChance(stronghold);
             modPetsService.updateStrongholdPetTooltip(stronghold);
@@ -128,6 +132,10 @@ export function renderModSettings(ctx, modCombatService, modPetsService) {
           });
         } else {
           game.dungeons.forEach((dungeon) => {
+            modPetsService.resetDungeonPetChance(dungeon);
+            modPetsService.updateDungeonPetTooltip(dungeon);
+          });
+          game.abyssDepths.forEach((dungeon) => {
             modPetsService.resetDungeonPetChance(dungeon);
             modPetsService.updateDungeonPetTooltip(dungeon);
           });

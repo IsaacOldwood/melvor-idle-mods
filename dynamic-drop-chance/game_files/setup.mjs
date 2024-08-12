@@ -26,6 +26,10 @@ export async function setup(ctx) {
       modSetupService.setupDungeonPet(modPetsService, dungeon);
     });
 
+    game.abyssDepths.forEach((dungeon) => {
+      modSetupService.setupDungeonPet(modPetsService, dungeon);
+    });
+
     game.strongholds.forEach((stronghold) => {
       modSetupService.setupStrongholdPet(stronghold);
     });
@@ -38,6 +42,9 @@ export async function setup(ctx) {
     if (ctx.settings.section("Pets").get("pets-enabled")) {
       console.log("[DDC] Updating pet drop chances");
       game.dungeons.forEach((dungeon) => {
+        modPetsService.updateDungeonPetChance(dungeon);
+      });
+      game.abyssDepths.forEach((dungeon) => {
         modPetsService.updateDungeonPetChance(dungeon);
       });
       game.strongholds.forEach((stronghold) => {
@@ -69,6 +76,11 @@ export async function setup(ctx) {
     // Setup pet tooltips
     console.log("[DDC] Updating pet tooltips");
     game.dungeons.forEach((dungeon) => {
+      modSetupService.setupDungeonPetTooltip(modPetsService, dungeon);
+      modPetsService.updateDungeonPetTooltip(dungeon);
+    });
+    
+    game.abyssDepths.forEach((dungeon) => {
       modSetupService.setupDungeonPetTooltip(modPetsService, dungeon);
       modPetsService.updateDungeonPetTooltip(dungeon);
     });
