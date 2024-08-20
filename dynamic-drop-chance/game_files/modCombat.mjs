@@ -4,7 +4,8 @@ export function updateCombatDropChances(
   multiplierThreshold,
   maxUserKillCountMultiplier,
   completionOnly,
-  customMultiplier
+  customMultiplier,
+  monsterDeath = false
 ) {
   if (!monster) {
     return;
@@ -31,6 +32,7 @@ export function updateCombatDropChances(
   for (const drop of lootTable.drops) {
     let item = drop.item;
     let dropWeight = drop.origWeight;
+    let prevWeight = drop.weight;
     let dropChance = (dropWeight / totalWeight) * lootChanceDecimal;
 
     // If drop chance is higher than threshold then don't modify
@@ -58,6 +60,12 @@ export function updateCombatDropChances(
     // Update weight and total weight accordingly
     drop.weight = Math.floor(newWeight);
     newTotalWeight += Math.floor(newWeight);
+
+    // Notify user of improved drop rate
+    if (monsterDeath && newWeight > prevWeight) {
+      let message = "New Drop rate for " + item._name;
+      game.notifications.createInfoNotification("DDC-" + message, message, game.combat.media);
+    }
   }
   // Set new total weight
   lootTable.totalWeight = newTotalWeight;

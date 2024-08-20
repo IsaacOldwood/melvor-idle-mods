@@ -118,7 +118,8 @@ export async function setup(ctx) {
       ctx.settings.section("Combat").get("multiplier-threshold"),
       ctx.settings.section("Combat").get("max-multiplier"),
       ctx.settings.section("Combat").get("completion-only"),
-      ctx.settings.section("Combat").get("custom-multiplier")
+      ctx.settings.section("Combat").get("custom-multiplier"),
+      true
     );
   });
 
