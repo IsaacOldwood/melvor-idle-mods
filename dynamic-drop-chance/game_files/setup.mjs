@@ -47,16 +47,16 @@ export async function setup(ctx) {
     if (ctx.settings.section("Pets").get("pets-enabled")) {
       console.log("[DDC] Updating pet drop chances");
       game.dungeons.forEach((dungeon) => {
-        modPetsService.updateDungeonPetChance(dungeon);
+        modPetsService.updateDungeonPetChance(dungeon, ctx.settings.section("Pets").get("custom-multiplier"));
       });
       game.abyssDepths.forEach((dungeon) => {
-        modPetsService.updateDungeonPetChance(dungeon);
+        modPetsService.updateDungeonPetChance(dungeon, ctx.settings.section("Pets").get("custom-multiplier"));
       });
       game.strongholds.forEach((stronghold) => {
-        modPetsService.updateStrongholdPetChance(stronghold);
+        modPetsService.updateStrongholdPetChance(stronghold, ctx.settings.section("Pets").get("custom-multiplier"));
       });
       game.slayerAreas.forEach((slayerArea) => {
-        modPetsService.updateSlayerAreaPetChance(slayerArea);
+        modPetsService.updateSlayerAreaPetChance(slayerArea, ctx.settings.section("Pets").get("custom-multiplier"));
       });
     }
 

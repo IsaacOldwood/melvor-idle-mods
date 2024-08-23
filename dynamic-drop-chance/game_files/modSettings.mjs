@@ -129,19 +129,19 @@ export function renderModSettings(ctx, modCombatService, modPetsService, modStro
       onChange: (val) => {
         if (val) {
           game.dungeons.forEach((dungeon) => {
-            modPetsService.updateDungeonPetChance(dungeon);
+            modPetsService.updateDungeonPetChance(dungeon, ctx.settings.section("Pets").get("custom-multiplier"));
             modPetsService.updateDungeonPetTooltip(dungeon);
           });
           game.abyssDepths.forEach((dungeon) => {
-            modPetsService.updateDungeonPetChance(dungeon);
+            modPetsService.updateDungeonPetChance(dungeon, ctx.settings.section("Pets").get("custom-multiplier"));
             modPetsService.updateDungeonPetTooltip(dungeon);
           });
           game.strongholds.forEach((stronghold) => {
-            modPetsService.updateStrongholdPetChance(stronghold);
+            modPetsService.updateStrongholdPetChance(stronghold, ctx.settings.section("Pets").get("custom-multiplier"));
             modPetsService.updateStrongholdPetTooltip(stronghold);
           });
           game.slayerAreas.forEach((slayerArea) => {
-            modPetsService.updateSlayerAreaPetChance(slayerArea);
+            modPetsService.updateSlayerAreaPetChance(slayerArea, ctx.settings.section("Pets").get("custom-multiplier"));
             modPetsService.updateSlayerAreaPetTooltip(slayerArea);
           });
         } else {
@@ -162,6 +162,32 @@ export function renderModSettings(ctx, modCombatService, modPetsService, modStro
             modPetsService.updateSlayerAreaPetTooltip(slayerArea);
           });
         }
+      },
+    },
+    {
+      type: "number",
+      name: "custom-multiplier",
+      label: "Custom Multiplier",
+      hint: "Custom multiplier applied to pet drop chance. Pet drop rate cannot exceed 1/2",
+      default: 1,
+      min: 1,
+      onChange: (val) => {
+        game.dungeons.forEach((dungeon) => {
+          modPetsService.updateDungeonPetChance(dungeon, val);
+          modPetsService.updateDungeonPetTooltip(dungeon);
+        });
+        game.abyssDepths.forEach((dungeon) => {
+          modPetsService.updateDungeonPetChance(dungeon, val);
+          modPetsService.updateDungeonPetTooltip(dungeon);
+        });
+        game.strongholds.forEach((stronghold) => {
+          modPetsService.updateStrongholdPetChance(stronghold, val);
+          modPetsService.updateStrongholdPetTooltip(stronghold);
+        });
+        game.slayerAreas.forEach((slayerArea) => {
+          modPetsService.updateSlayerAreaPetChance(slayerArea, val);
+          modPetsService.updateSlayerAreaPetTooltip(slayerArea);
+        });
       },
     },
   ]);

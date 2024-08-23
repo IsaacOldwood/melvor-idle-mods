@@ -12,7 +12,7 @@ export function assertDungeonPet(dungeon) {
   return dungeon.pet.weight != 1;
 }
 
-export function updateDungeonPetChance(dungeon) {
+export function updateDungeonPetChance(dungeon, customMultiplier) {
   if (!assertDungeonPet(dungeon)) {
     return;
   }
@@ -20,8 +20,8 @@ export function updateDungeonPetChance(dungeon) {
   const pet = dungeon.pet;
 
   let completionCount = game.combat.getDungeonCompleteCount(dungeon);
-  let petMultiplier = Math.max(Math.ceil(completionCount / pet.origWeight), 1);
-  pet.weight = Math.floor(pet.origWeight / petMultiplier);
+  let petMultiplier = Math.max(Math.ceil(completionCount / pet.origWeight) * customMultiplier, 1);
+  pet.weight = Math.max(Math.floor(pet.origWeight / petMultiplier), 2);
 }
 
 export function resetDungeonPetChance(dungeon) {
@@ -52,15 +52,15 @@ export function updateDungeonPetTooltip(dungeon) {
   }
 }
 
-export function updateStrongholdPetChance(stronghold) {
+export function updateStrongholdPetChance(stronghold, customMultiplier) {
   if (!stronghold.hasOwnProperty("pet")) {
     return false;
   }
   const pet = stronghold.pet;
 
   let completionCount = stronghold.timesCompleted;
-  let petMultiplier = Math.max(Math.ceil(completionCount / pet.origWeight), 1);
-  pet.weight = Math.floor(pet.origWeight / petMultiplier);
+  let petMultiplier = Math.max(Math.ceil(completionCount / pet.origWeight) * customMultiplier, 1);
+  pet.weight = Math.max(Math.floor(pet.origWeight / petMultiplier), 2);
 }
 
 export function resetStrongholdPetChance(stronghold) {
@@ -89,7 +89,7 @@ export function updateStrongholdPetTooltip(stronghold) {
   }
 }
 
-export function updateSlayerAreaPetChance(slayerArea) {
+export function updateSlayerAreaPetChance(slayerArea, customMultiplier) {
   if (!slayerArea.hasOwnProperty("pet")) {
     return;
   }
@@ -105,8 +105,8 @@ export function updateSlayerAreaPetChance(slayerArea) {
   }
 
   // Set new drop chance
-  let petMultiplier = Math.max(Math.ceil(areaKills / slayerArea.pet.origWeight), 1);
-  slayerArea.pet.weight = Math.floor(slayerArea.pet.origWeight / petMultiplier);
+  let petMultiplier = Math.max(Math.ceil(areaKills / slayerArea.pet.origWeight) * customMultiplier, 1);
+  slayerArea.pet.weight = Math.max(Math.floor(slayerArea.pet.origWeight / petMultiplier), 2);
 }
 
 export function resetSlayerAreaPetChance(slayerArea) {
