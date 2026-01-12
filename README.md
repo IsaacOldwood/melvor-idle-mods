@@ -29,4 +29,4 @@ From the [Wiki](https://wiki.melvoridle.com/w/Main_Page):
 [Auto Equip Loot](https://mod.io/g/melvoridle/m/auto-equip-loot)
 [152 active users]
 
-*(Data correct as of 29/08/25)*
+*(Data correct as of 12/01/26)*
